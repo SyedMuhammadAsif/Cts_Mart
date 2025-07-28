@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+.theme-major-color {
+  background-color: #0078ad;
+}
+
+.theme-minor-color {
+  background-color: #0c5273;
+}
+
+.theme-accent-color {
+  background-color: #e6e6e6;
+}
