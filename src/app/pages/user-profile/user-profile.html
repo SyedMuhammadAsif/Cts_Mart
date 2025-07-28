@@ -1,6 +1,6 @@
 @if (isLoggedIn()) {
 <div class="dropdown-center">
-  <a class="btn dropdown-toggle text-light nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+  <a class="cursor-pointer dropdown-toggle text-light nav-link" role="button" data-bs-toggle="dropdown" aria-expanded="false">
    Profile 
   </a>
   <ul class="dropdown-menu dropdown-menu-end">
@@ -10,5 +10,5 @@
 </div>
 }
 @else {
-    <a class="nav-link text-light btn" routerLink="signup">Signup/Login</a>
+    <a class="nav-link text-light cursor-pointer" routerLink="signup">Signup/Login</a>
 }
