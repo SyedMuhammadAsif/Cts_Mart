@@ -10,3 +10,15 @@
 .theme-accent-color {
   background-color: #e6e6e6;
 }
+
+.theme-major-element-color {
+  color: #0078ad;
+}
+
+.theme-minor-element-color {
+  color: #0c5273;
+}
+
+.theme-accent-element-color {
+  color: #e6e6e6;
+}
