@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { UserAuth } from '../../services/user-auth';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-profile',
@@ -10,16 +10,14 @@ import { RouterLink } from '@angular/router';
   styleUrl: './user-profile.css'
 })
 export class UserProfile {
-  constructor(private auth: UserAuth) {}
+  constructor(private auth: UserAuth, private router: Router) {}
 
   logout() {
     this.auth.logout();
+    this.router.navigate(['']);
   }
 
   isLoggedIn() {
     return this.auth.isLoggedIn();
-  }
-
-  login() {
   }
 }

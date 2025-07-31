@@ -22,3 +22,8 @@
 .theme-accent-element-color {
   color: #e6e6e6;
 }
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
