@@ -27,3 +27,30 @@ a {
   cursor: pointer;
   text-decoration: none;
 }
+
+
+:root {
+  --primary: #0078ad;
+  --primary-light: #0c5273;
+  --secondary: #64748b;
+  --background: #f8fafc;
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-900: #111827;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+   --cts-blue: #0078ad;
+
+    --prussian-blue: #003153;        /* Main brand color - Prussian Blue */
+  --prussian-blue-light: #004d7a;  /* Lighter shade for hover states */
+  --prussian-blue-dark: #002142;   /* Darker shade for active states */
+  --text-light: #ffffff;           /* White text for contrast */
+  --text-muted: #6c757d;          /* Bootstrap muted text color */
+  --border-light: #dee2e6;        /* Light border color */
+  --shadow-light: rgba(0, 49, 83, 0.1); /* Subtle shadow with brand color */
+}
