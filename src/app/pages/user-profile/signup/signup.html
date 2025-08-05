@@ -1,0 +1,52 @@
+<div class="modal-overlay">
+    <div class="modal-card">
+        <button class="btn btn-outline-dark d-flex ml-auto" (click)="closeModal()">X</button>
+        <img src="cts-logo.jpeg" alt="cts-logo" class="d-flex m-auto" width="50" height="50" />
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <h2 class="d-flex justify-content-center">Join the CtsMart</h2>
+
+        <div *ngIf="registerMessage" class="d-flex justify-content-center p-2 bg-success rounded text-light">
+            {{ registerMessage }}
+        </div>
+
+        <div *ngIf="errorMessage" class="d-flex justify-content-center p-2 bg-danger rounded text-light">
+            {{ errorMessage }}
+        </div>
+
+        <div class="p-3">
+            <div class="mb-2">
+                <label>Username</label>
+                <input formControlName="name" placeholder="name">
+                <span *ngIf="signupForm.get('name')?.touched && signupForm.get('name')?.invalid" class="text-danger">please enter valid Username. </span>
+                <small *ngIf="signupForm.get('name')?.errors?.['pattern']">Username must be at least 5 characters, No special characters allowed.</small>
+            </div>
+
+            <div class="mb-2">
+                <label>Email</label>
+                <input formControlName="email" placeholder="name">
+                <span *ngIf="signupForm.get('email')?.touched && signupForm.get('email')?.invalid" class="text-danger">please enter valid email</span>
+            </div>
+
+            <div class="mb-2">
+                <label>Password</label>
+                <input formControlName="password" type="password" placeholder="password">
+                <span *ngIf="signupForm.get('password')?.touched && signupForm.get('password')?.invalid" class="text-danger">please enter valid Password. </span>
+                <small *ngIf="signupForm.get('password')?.errors?.['pattern']">Password must be at least 8 characters, include one uppercase letter and one number.</small>
+            </div>
+
+            <div class="mb-2">
+                <label>Confirm Password</label>
+                <input formControlName="confirmPassword" type="password" placeholder="confirm password">
+                <span *ngIf="signupForm.get('confirmPassword')?.touched && signupForm.get('confirmPassword')?.invalid" class="text-danger">Passwords doesn't match</span>
+            </div>
+        </div>
+
+        <p class="ml-3 pb-3">By Signup, you agree to our <a routerLink="/" style="color: #0078ad">Terms of Service</a> & <a routerLink="/" style="color: #0078ad">Privacy Policy</a>.</p>
+
+        <button [disabled]="signupForm.invalid" type="submit" class="d-flex m-auto btn text-light bg-info">Signup</button>
+
+        <p class="p-3">Already have an account? <a routerLink="/login" style="color: #0078ad">Login</a></p>
+        
+    </form>
+    </div>
+</div>

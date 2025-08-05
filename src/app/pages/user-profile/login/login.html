@@ -1,0 +1,31 @@
+<div class="modal-overlay">
+    <div class="modal-card">
+        <button class="btn btn-outline-dark d-flex ml-auto" (click)="closeModal()">X</button>
+        <img src="cts-logo.jpeg" alt="cts-logo" class="d-flex m-auto" width="50" height="50" />
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <h2 class="d-flex justify-content-center">Login to Proceed</h2>
+
+        <div *ngIf="errorMessage" class="d-flex justify-content-center p-2 bg-danger rounded text-light">
+            {{ errorMessage }}
+        </div>
+
+        <div class="p-4">
+            <div class="mb-2">
+                <label>Username</label>
+                <input formControlName="name" placeholder="name">
+                <span *ngIf="loginForm.get('name')?.touched && loginForm.get('name')?.invalid" class="text-danger">please enter valid Username</span>
+            </div>
+
+            <div>
+                <label>Password</label>
+                <input formControlName="password" type="password" placeholder="password">
+                <span *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-danger">please enter valid Password</span>
+            </div>
+        </div>
+
+        <button [disabled]="loginForm.invalid" type="submit" class="d-flex m-auto btn text-light bg-info" >Login</button>
+
+        <p class="pt-3 ml-3">Don't have an account? <a routerLink="/signup" style="color: #0078ad">Signup</a></p>
+    </form>
+    </div>
+</div>
