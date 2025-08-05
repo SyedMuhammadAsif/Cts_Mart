@@ -1,0 +1,295 @@
+<div class="container-fluid">
+  <div class=" row g-0">
+    <!-- Filter Sidebar -->
+    <div class="col-lg-3 col-md-4 filter-sidebar">
+      <div class="filter-header">
+        <h5>Filters</h5>
+      </div>
+      
+      <!-- Brand Filter -->
+      <div class="filter-section">
+        <h6 class="filter-title">Brands</h6>
+        <div class="brand-scroll pl-5 ">
+          <div class="form-check mt-1" *ngFor="let brand of availableBrands; trackBy: trackByBrand">
+            <input 
+              class="form-check-input " 
+              type="checkbox" 
+              [id]="'brand-' + brand"
+              [checked]="isBrandSelected(brand)"
+              (change)="onBrandChange(brand, $event)">
+            <label class="form-check-label" [for]="'brand-' + brand">
+              {{ brand }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock Filter --> 
+      <div class="filter-section">
+        <h6 class="filter-title">Availability</h6>
+        <div class="form-check pl-5 ">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            id="inStock"
+            [(ngModel)]="tempInStockOnly">
+          <label class="form-check-label" for="inStock">
+            In Stock Only
+          </label>
+        </div>
+      </div>
+
+      <!-- Rating Filter -->
+      <div class="filter-section">
+        <h6 class="filter-title">Minimum Rating</h6>
+        <select 
+          class="form-select"
+          [(ngModel)]="tempMinRating">
+          <option value="0">All Ratings</option>
+          <option value="1">1+ Stars</option>
+          <option value="2">2+ Stars</option>
+          <option value="3">3+ Stars</option>
+          <option value="4">4+ Stars</option>
+          <option value="4.5">4.5+ Stars</option>
+        </select>
+      </div>
+
+      <!-- Price Filter -->
+      <div class="filter-section">
+        <h6 class="filter-title">Price Range</h6>
+        <div class="row">
+          <div class="col-6 p-2">
+            <label class="form-label">Min</label>
+            <input 
+              type="number" 
+              class="form-control"
+              [(ngModel)]="tempMinPrice"
+              min="0">
+          </div>
+          <div class="col-6 p-2">
+            <label class="form-label">Max</label>
+            <input 
+              type="number" 
+              class="form-control"
+              [(ngModel)]="tempMaxPrice"
+              min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="filter-actions">
+        <button 
+          class="btn btn-apply-button" 
+          (click)="applyFilters()">
+          Apply Filters
+        </button>
+        <button 
+          class="btn btn-cancel-button" 
+          (click)="clearFilters()">
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <!-- Product Area -->
+    <div class="col-lg-9 col-md-8 product-area">
+      
+      <!-- Header -->
+      <div class="product-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div class="mb-2 mb-md-0">
+            <h4 class="mb-1">
+            <img src="https://cdn-icons-png.flaticon.com/512/3114/3114883.png" width="25px" routerLink="/home" style="cursor: pointer" />
+              Products 
+              <span class="badge rounded">{{ filteredProducts.length }}</span>
+            </h4>
+            <small *ngIf="categoryDisplayName" style="margin-left: 31px;">
+              Category: {{ categoryDisplayName }}
+            </small>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <div>
+              <label class="form-label ml-1">Sort By:</label>
+              <select 
+                class="form-select"
+                [(ngModel)]="sortBy"
+                (change)="onSortChange()">
+                <option *ngFor="let option of sortOptions" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label ml-1">Order:</label>
+              <select 
+                class="form-select"
+                [(ngModel)]="sortOrder"
+                (change)="onSortChange()"
+                [disabled]="!sortBy">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="product-content">
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-state">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3">Loading products...</p>
+        </div>
+
+        <!-- Loading More State -->
+        <div *ngIf="loadingMore && !loading" class="loading-more-state text-center mt-3">
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading more...</span>
+          </div>
+          <small class="ms-2">Loading more products...</small>
+        </div>
+
+        <!-- No Products -->
+        <div *ngIf="!loading && displayedProducts.length === 0" class="empty-state">
+          <div style="font-size: 3rem;" class="mb-3"></div>
+          <h4>No products found</h4>
+          <p>Try adjusting your filters to see more products.</p>
+        </div>
+
+        <!-- Product List -->
+        <div class="product-list" *ngIf="!loading && displayedProducts.length > 0">
+        
+          <div class="product-row" *ngFor="let product of displayedProducts; trackBy: trackByProduct">
+             <a [routerLink]="['/product', product.id]" class="card-link">
+            <div class="row align-items-center">
+              <!-- Product Image -->
+              <div class="col-md-3 col-sm-4">
+                <div class="product-image-container">
+                  <img 
+                    [src]="product.thumbnail" 
+                    [alt]="product.title"
+                    class="product-row-image">
+                  
+                  <!-- Stock Badge -->
+                  <!-- <div class="stock-badge-container">
+                    <span class="badge" 
+                          [class]="(product.stock && product.stock > 0) ? 'badge-success' : 'badge-danger'">
+                      {{ (product.stock && product.stock > 0) ? 'In Stock' : 'Out of Stock' }}
+                    </span>
+                  </div> -->
+                  
+                  <!-- Discount Badge -->
+                  <!-- <div class="discount-badge-container" *ngIf="product.discountPercentage && product.discountPercentage > 0">
+                    <span class="badge badge-warning">
+                      {{ product.discountPercentage }}% OFF
+                    </span>
+                  </div> -->
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="col-md-7 col-sm-8">
+                <div class="product-info">
+                  <h5 class="product-title">{{ product.title }}</h5>
+                  
+                  <p class="product-brand" *ngIf="product.brand">
+                     <strong>{{ product.brand }}</strong>
+                  </p>
+
+                  <!-- Rating -->
+                  <div class="product-rating" *ngIf="product.rating">
+                    <span class="stars">
+                      <span *ngFor="let star of getStars(product.rating)">{{ star }}</span>
+                    </span>
+                    <span class="rating-value">({{ product.rating }})</span>
+                  </div>
+
+                  <p class="product-description">
+                    {{ product.description }}
+                  </p>
+
+                  <div class="stock-info" *ngIf="product.stock">
+                     Stock Availability: {{ product.stock }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="col-md-2 col-sm-12">
+                <div class="price-section">
+                  <div class="current-price">${{ product.price }}</div>
+                  <div class="price-details" *ngIf="product.discountPercentage">
+                    <small>Save {{ product.discountPercentage }}%</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="pagination-nav" *ngIf="!loading && totalPages > 0">
+          <ul class="pagination justify-content-center">
+            
+            <!-- Previous -->
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+                ← Previous
+              </button>
+            </li>
+
+            <!-- First Page -->
+            <li class="page-item" [class.active]="currentPage === 1" *ngIf="currentPage > 3">
+              <button class="page-link" (click)="changePage(1)">1</button>
+            </li>
+            
+            <!-- Ellipsis -->
+            <li class="page-item disabled" *ngIf="currentPage > 4">
+              <span class="page-link">...</span>
+            </li>
+
+            <!-- Page Numbers -->
+            <li class="page-item" 
+                [class.active]="page === currentPage"
+                *ngFor="let page of getPaginationArray()">
+              <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+            </li>
+
+            <!-- Ellipsis -->
+            <li class="page-item disabled" *ngIf="currentPage < totalPages - 3">
+              <span class="page-link">...</span>
+            </li>
+
+            <!-- Last Page -->
+            <li class="page-item" [class.active]="currentPage === totalPages" *ngIf="currentPage < totalPages - 2">
+              <button class="page-link" (click)="changePage(totalPages)">{{ totalPages }}</button>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                Next →
+              </button>
+            </li>
+            
+          </ul>
+          
+          <!-- Page Info -->
+          <div class="pagination-info">
+            Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} to 
+            {{ getMin(currentPage * itemsPerPage, filteredProducts.length) }} 
+            of {{ filteredProducts.length }} products
+          </div>
+          
+        </nav>
+
+      </div>
+    </div>
+  </div>
+</div>
