@@ -139,12 +139,6 @@
   margin: 2rem 0;
 }
 
-.banner-carousel {
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
 .inter-banner-image {
   height: 200px;
   object-fit: cover;

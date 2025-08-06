@@ -92,15 +92,23 @@
       </div>
     </section>
 
-    <!-- Product Categories with Carousels -->
-    <div *ngFor="let category of categoriesWithProducts; let i = index" class="category-section mb-4">
-      
-      <!-- Add banner between categories (every 2nd category starting from index 1) -->
-      <div *ngIf="i > 0 && i % 2 === 1" class="inter-category-banner mb-4">
-        <div class="banner-carousel">
-          <img [src]="bannerImages[(i % bannerImages.length)]" class="d-block w-100 inter-banner-image" alt="Promotional Banner">
+      <!-- trends-banners -->
+        <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <img src="trend-banners/trend-banner-1.jpg" alt="" class="img-fluid rounded">
+          </div>
+          <div class="col-md-4">
+            <img src="trend-banners/trend-banner-2.jpg" alt="" class="img-fluid rounded">
+          </div>
+          <div class="col-md-4">
+            <img src="trend-banners/trend-banner-3.jpg" alt="" class="img-fluid rounded">
+          </div>
         </div>
       </div>
+
+    <!-- Product Categories with Carousels -->
+    <div *ngFor="let category of categoriesWithProducts; let i = index" class="category-section mb-4">
 
       <div class="d-flex justify-content-between align-items-center mb-2 pl-3 pt-3">
         <h2 class="category-title text-capitalize m-0">{{ category.name }}</h2>
@@ -146,6 +154,5 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
