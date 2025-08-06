@@ -1,0 +1,156 @@
+
+.carousel-item {
+  /* Add padding to the top and bottom of each carousel slide.
+     This creates space for the lifted card and its shadow, preventing clipping.
+     Adjust these values if your lift (transform: translateY) or shadow is larger. */
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+
+.effect {
+  /* Match the card's border-radius for the shadow to align nicely */
+  border-radius: 0.25rem; /* Ensure this matches your card's actual border-radius */
+  
+  /* Ensure a background color so the shadow is visible against it.
+     Assuming your cards are white, adjust as needed. */
+  background-color: #fff;
+
+  /* Apply a very subtle default shadow for depth, making cards slightly pop */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.10);
+  
+
+  /* Add smooth transitions for all properties that change on hover.
+     This ensures a fluid animation when the mouse enters and leaves. */
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+
+  /* Indicate that the element is clickable even before hovering */
+  cursor: pointer;
+
+  /* Ensure the whole card is covered by the effect and maintains consistent layout.
+     `display: flex` and `flex-direction: column` help with varying content heights. */
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Important for consistent sizing of cards within a row */
+}
+
+.effect:hover {
+  /* Stronger, more prominent shadow on hover for a clear "lift" effect */
+  box-shadow: 0 6px 12px rgba(0, 120, 173, 0.25);
+  border-color: var(--cts-blue);
+  /* Lift the card slightly upwards for a floating sensation */
+  transform: translateY(-8px); /* Adjust this value for more or less lift */
+
+  /* Optional: Uncomment the line below if you want a subtle background tint on hover */
+  /* background-color: #f9f9f9; */
+}
+
+
+/* --- Additional Styles for Product Card Consistency --- */
+.product-card {
+  width: 100%;
+  border-radius: 1px;
+  /* CHANGE: Use min-height instead of fixed height, or remove height entirely if content dictates */
+  /* This allows the card to grow if content wraps, but ensures a minimum size */
+  min-height: 400px;
+}
+
+
+
+
+/* --- Image Styling for Uniformity --- */
+.card-img-top {
+   max-height: 200px; /* Adjust this to a suitable maximum image height */
+  height: auto; /* Allow image height to adjust automatically */
+  object-fit: contain;
+  padding: 10px;
+}
+
+
+/* --- Card Body Layout --- */
+.card-body {
+  flex-grow: 1; 
+}
+
+
+/* --- Carousel Control Icons (Previous/Next Arrows) --- */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  /* By default, Bootstrap icons can be dark. This filter makes them white,
+     improving visibility against darker backgrounds. */
+  filter: invert(1) grayscale(100%) brightness(200%);
+
+  /* If your icons are already white and you want them black, use: */
+  /* filter: brightness(0) invert(1); */
+
+  /* For a specific color, you might need to adjust filter values or use an SVG icon directly */
+}
+
+
+
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%; /* Adjust the clickable area width of the control buttons */
+  /* background-color: rgba(0, 0, 0, 0.3); /* Uncomment for a semi-transparent black background for the button area */
+  border-radius: 0.25rem; /* Slightly rounded corners for the button area */
+  transition: background-color 0.2s ease; /* Smooth transition for background changes */
+}
+
+
+
+/* --- Rating and Star Alignment --- */
+.rating-display {
+  display: flex;        /* This makes the <p> a flex container */
+  align-items: center;  /* This vertically centers the items (rating number and star) */
+  gap: 4px;             /* Adds space between them */
+  margin-bottom: 0;     /* Adjust or remove p's default bottom margin as needed */
+}
+
+.rating-display svg {
+  vertical-align: middle; /* Optional fine-tuning for SVG */
+}
+
+/* --- Similar Products Header and Controls --- */
+.similar-products-header {
+  border-bottom: 2px solid var(--cts-blue);
+  padding-bottom: 10px;
+  margin-bottom: 1rem;
+}
+
+.similar-products-title {
+  font-weight: 600;
+  color: var(--cts-blue);
+  margin-bottom: 0;
+}
+
+.similar-products-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.similar-products-controls .btn {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.3s ease;
+  border: 2px solid var(--cts-blue);
+  background: transparent;
+  color: var(--cts-blue);
+}
+
+.similar-products-controls .btn:hover {
+  background: var(--cts-blue);
+  color: white;
+  transform: scale(1.1);
+}
+
+.similar-products-controls .btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 120, 173, 0.25);
+}
+ 

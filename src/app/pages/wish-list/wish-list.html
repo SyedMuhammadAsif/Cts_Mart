@@ -1,0 +1,51 @@
+<div class="container my-4">
+  <h2>My Wishlist</h2>
+
+  <!-- Loading -->
+  <div *ngIf="loading">
+    <p>Loading...</p>
+  </div>
+
+  <!-- Empty Wishlist -->
+  <div *ngIf="!loading && wishlistItems.length === 0">
+    <p>Your wishlist is empty.</p>
+    <a [routerLink]="['/product','1']" class="btn btn-primary">Start Shopping</a>
+  </div>
+
+  <!-- Wishlist Items -->
+  <div *ngIf="!loading && wishlistItems.length > 0" class="wishlist-container">
+    <p>You have {{wishlistItems.length}} items in your wishlist</p>
+    
+    <!-- Header Row -->
+    <div class="wishlist-header">
+      <div class="col-image">Image</div>
+      <div class="col-product">Product</div>
+      <div class="col-price">Price</div>
+      <div class="col-brand">Brand</div>
+      <div class="col-actions">Actions</div>
+    </div>
+
+    <!-- Data Rows -->
+    <div class="wishlist-row" *ngFor="let item of wishlistItems">
+      <div class="col-image">
+        <img [src]="item.product.thumbnail" [alt]="item.product.title">
+      </div>
+      <div class="col-product">
+        <h6>{{ item.product.title }}</h6>
+        <small>{{ item.product.description | slice:0:40 }}...</small>
+        <br><small class="text-muted">Added: {{ item.addedAt | date:'short' }}</small>
+      </div>
+      <div class="col-price">
+        <strong>₹{{ item.product.price }}</strong>
+      </div>
+      <div class="col-brand">
+        {{ item.product.brand }}
+        <br><small>Rating: {{ item.product.rating }}</small>
+      </div>
+      <div class="col-actions">
+        <a [routerLink]="['/product', item.product.id]" class="btn btn-sm btn-primary mb-1">View</a>
+        <button class="btn btn-sm btn-danger" (click)="deleteFromWishlist(item.id)">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
