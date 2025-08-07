@@ -3,13 +3,13 @@
   <div class="container-fluid m-2">
     <a class="navbar-brand text-light d-flex align-items-center font-weight-bold" routerLink="/">
       <img 
-        src="cts-logo.jpeg" 
+        src="megamart-logo.jpeg" 
         width="40" 
         height="40" 
         class="rounded d-inline-block align-top mr-2" 
-        alt="CtsMart Logo"
+        alt="MegaMart Logo"
       >
-      CtsMart
+      MegaMart
     </a>
 
     <button 
@@ -26,8 +26,8 @@
 
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <div class="d-flex w-100 justify-content-center m-2">
-        <form class="form-inline" role="search">
-          <input class="form-control mr-2" type="search" placeholder="Explore" aria-label="Search" style="width: 70%;">
+        <form class="form-inline" role="search" (ngSubmit)="onSearchSubmit($event)" >
+          <input class="form-control mr-2" type="search" placeholder="Explore" aria-label="Search" style="width: 70%;" [(ngModel)]="searchQuery" name="searchQuery" (keydown.enter)="onSearch()" >
           <button class="btn btn-outline-light" type="submit">Search</button>
         </form>
       </div>
@@ -40,7 +40,12 @@
           <a class="nav-link text-light" routerLink="/wishlist">Wishlist</a>
         </li>
         <li class="nav-item mx-2">
-          <a class="nav-link text-light" href="#">Cart</a>
+          <a class="nav-link text-light cart-link" routerLink="/cart">Cart
+            <span *ngIf="isLoggedIn() && cartCount > 0" class="cart-badge">{{ cartCount }}</span>
+          </a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link text-light" routerLink="/orders">Orders</a>
         </li>
         <li class="nav-item mx-2">
           <app-user-profile />
@@ -55,7 +60,7 @@
   <div class="container-fluid">
     <ul class="navbar-nav mr-auto d-flex flex-row align-items-center">
       <li class="nav-item mx-2">
-        <a class="nav-link text-light d-flex flex-row align-items-center" href="#">
+        <a class="nav-link text-light d-flex flex-row align-items-center" routerLink="/checkout/address">
           Address:
           <div class="d-flex flex-column align-items-center ml-2">
             <div class="font-weight-bold" style="font-size: 85%">Chennai</div>

@@ -1,0 +1,161 @@
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+.btn-success:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
+}
+
+.invalid-feedback {
+  font-size: 0.875rem;
+}
+
+.text-success {
+  color: #198754 !important;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.form-text {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Credit card input styling */
+#cardNumber {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+}
+
+#cvv {
+  font-family: 'Courier New', monospace;
+  text-align: center;
+}
+
+/* Security notice styling */
+.security-notice {
+  border-left: 3px solid #198754;
+  padding-left: 0.75rem;
+}
+
+/* Processing state */
+.processing-overlay {
+  position: relative;
+}
+
+.processing-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+.payment-method-card {
+  border-color: #dee2e6 !important;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.payment-method-card:hover {
+  border-color: #007bff !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 123, 255, 0.075);
+  transform: translateY(-1px);
+}
+
+.payment-method-card.selected {
+  border-color: #007bff !important;
+  background-color: rgba(0, 123, 255, 0.1);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 123, 255, 0.15);
+}
+
+.payment-method-card.selected .card-body {
+  color: #007bff;
+}
+
+.payment-method-card .card-body {
+  transition: color 0.3s ease;
+} 
+
+/* Placeholder styling - make placeholders dull/muted */
+.form-control::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7 !important;
+  font-style: italic;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7 !important;
+  font-style: italic;
+}
+
+.form-control::-moz-placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7 !important;
+  font-style: italic;
+}
+
+.form-control:-ms-input-placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7 !important;
+  font-style: italic;
+}
+
+/* Select placeholder styling */
+.form-control option[value=""][disabled] {
+  color: #9ca3af !important;
+  font-style: italic;
+} 

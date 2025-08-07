@@ -1,0 +1,243 @@
+<div class="container mt-4">
+  <div class="row">
+    <!-- Address Form -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <svg width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+              <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/>
+            </svg>
+            Shipping Address
+          </h4>
+        </div>
+        <div class="card-body">
+          <form #addressForm="ngForm" (ngSubmit)="onSubmit(addressForm)" novalidate>
+            <!-- Personal Information -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="fullName" class="form-label">Full Name *</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="fullName"
+                  name="fullName"
+                  [(ngModel)]="address.fullName"
+                  required
+                  #fullName="ngModel"
+                  [class.is-invalid]="fullName.invalid && fullName.touched">
+                <div class="invalid-feedback" *ngIf="fullName.invalid && fullName.touched">
+                  Full name is required
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="email" class="form-label">Email *</label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  id="email"
+                  name="email"
+                  [(ngModel)]="address.email"
+                  required
+                  email
+                  #email="ngModel"
+                  [class.is-invalid]="email.invalid && email.touched">
+                <div class="invalid-feedback" *ngIf="email.invalid && email.touched">
+                  <span *ngIf="email.errors?.['required']">Email is required</span>
+                  <span *ngIf="email.errors?.['email']">Please enter a valid email</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="phone" class="form-label">Phone Number *</label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  id="phone"
+                  name="phone"
+                  [(ngModel)]="address.phone"
+                  required
+                  #phone="ngModel"
+                  [class.is-invalid]="phone.invalid && phone.touched"
+                  placeholder="(555) 123-4567">
+                <div class="invalid-feedback" *ngIf="phone.invalid && phone.touched">
+                  Phone number is required
+                </div>
+              </div>
+            </div>
+
+            <!-- Address Lines -->
+            <div class="mb-3">
+              <label for="addressLine1" class="form-label">Address Line 1 *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="addressLine1"
+                name="addressLine1"
+                [(ngModel)]="address.addressLine1"
+                required
+                #addressLine1="ngModel"
+                [class.is-invalid]="addressLine1.invalid && addressLine1.touched"
+                placeholder="Street address, P.O. box">
+              <div class="invalid-feedback" *ngIf="addressLine1.invalid && addressLine1.touched">
+                Address is required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="addressLine2" class="form-label">Address Line 2</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="addressLine2"
+                name="addressLine2"
+                [(ngModel)]="address.addressLine2"
+                placeholder="Apartment, suite, unit, building, floor, etc.">
+            </div>
+
+            <!-- City, State, ZIP -->
+            <div class="row mb-3">
+              <div class="col-md-5">
+                <label for="city" class="form-label">City *</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="city"
+                  name="city"
+                  [(ngModel)]="address.city"
+                  required
+                  #city="ngModel"
+                  [class.is-invalid]="city.invalid && city.touched">
+                <div class="invalid-feedback" *ngIf="city.invalid && city.touched">
+                  City is required
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label for="state" class="form-label">State *</label>
+                <select 
+                  class="form-control" 
+                  id="state"
+                  name="state"
+                  [(ngModel)]="address.state"
+                  required
+                  #state="ngModel"
+                  [class.is-invalid]="state.invalid && state.touched">
+                  <option value="" disabled>Select State</option>
+                  <option *ngFor="let stateCode of states" [value]="stateCode">{{stateCode}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="state.invalid && state.touched">
+                  State is required
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label for="postalCode" class="form-label">ZIP Code *</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="postalCode"
+                  name="postalCode"
+                  [(ngModel)]="address.postalCode"
+                  required
+                  #postalCode="ngModel"
+                  [class.is-invalid]="postalCode.invalid && postalCode.touched"
+                  placeholder="12345">
+                <div class="invalid-feedback" *ngIf="postalCode.invalid && postalCode.touched">
+                  ZIP code is required
+                </div>
+              </div>
+            </div>
+
+            <!-- Country -->
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <label for="country" class="form-label">Country</label>
+                <select 
+                  class="form-control" 
+                  id="country"
+                  name="country"
+                  [(ngModel)]="address.country">
+                  <option value="USA">United States</option>
+                  <option value="CAN">Canada</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Default Address Checkbox -->
+            <div class="form-check mb-4">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                id="isDefault"
+                name="isDefault"
+                [(ngModel)]="address.isDefault">
+              <label class="form-check-label" for="isDefault">
+                Save as default shipping address
+              </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-outline-secondary" (click)="goBackToCart()">
+                <svg width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                </svg>
+                Back to Cart
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">
+                Continue to Payment
+                <svg width="16" height="16" fill="currentColor" class="ms-1" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Order Summary</h5>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let item of cart.items" class="d-flex justify-content-between align-items-center mb-2">
+            <div class="flex-grow-1">
+              <div class="fw-bold">{{item.Product?.title || 'Product'}}</div>
+              <small class="text-muted">Qty: {{item.Quantity}}</small>
+            </div>
+            <div class="text-end">
+              {{formatPrice(item.TotalPrice)}}
+            </div>
+          </div>
+          
+          <hr>
+          
+          <div class="d-flex justify-content-between">
+            <span>Subtotal:</span>
+            <span>{{formatPrice(cart.totalPrice)}}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Shipping:</span>
+            <span class="text-success">FREE</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Tax:</span>
+            <span>{{formatPrice(cart.totalPrice * 0.08)}}</span>
+          </div>
+          
+          <hr>
+          
+          <div class="d-flex justify-content-between fw-bold fs-5">
+            <span>Total:</span>
+            <span>{{formatPrice(cart.totalPrice * 1.08)}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

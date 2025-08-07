@@ -1,0 +1,58 @@
+.navbar-action-item:focus,
+.mobile-action-item:focus,
+.hamburger-menu-icon:focus,
+.mobile-search-icon:focus,
+.sidebar-category-link:focus {
+  outline: 2px solid var(--text-light);
+  outline-offset: 2px;
+}
+ 
+/* Ensure sufficient color contrast */
+.delivery-location-input:focus,
+.mobile-delivery-input:focus {
+  outline: 2px solid var(--text-light);
+  outline-offset: 1px;
+}
+ 
+/* ================================
+   ANIMATION CLASSES
+   ================================ */
+ 
+/* Smooth transitions for interactive elements */
+* {
+  box-sizing: border-box;
+}
+ 
+/* Prevent horizontal scroll on sidebar animation */
+body {
+  overflow-x: hidden;
+}
+
+.nav-link{
+    cursor: pointer;
+}
+
+/* Cart notification badge styling */
+.cart-link {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

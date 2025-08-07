@@ -24,7 +24,7 @@ export class Login {
     this.auth.login(this.loginForm.value).subscribe({
       next: () => {
         this.errorMessage = ''; 
-        this.router.navigate(['/product_details']); 
+        this.router.navigate(['/home']); 
       },
       error: err => {
         this.loginForm.markAllAsTouched();
