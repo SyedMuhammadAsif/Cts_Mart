@@ -10,5 +10,5 @@ import { Footer } from "./common/footer/footer";
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('CTS_Mart');
+  protected readonly title = signal('MEGA_Mart');
 }

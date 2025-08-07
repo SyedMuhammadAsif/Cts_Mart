@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "CTS_Mart": {
+    "MEGA_Mart": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -56,10 +56,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "CTS_Mart:build:production"
+              "buildTarget": "MEGA_Mart:build:production"
             },
             "development": {
-              "buildTarget": "CTS_Mart:build:development"
+              "buildTarget": "MEGA_Mart:build:development"
             }
           },
           "defaultConfiguration": "development"
