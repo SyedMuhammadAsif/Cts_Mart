@@ -1,6 +1,6 @@
 
-<div class="container my-3" *ngIf="!loading && product; else loadingTpl">
-<nav aria-label="breadcrumb" class="d-flex ml-4 mb-2">
+<div class="container my-5" *ngIf="!loading && product; else loadingTpl">
+<nav aria-label="breadcrumb" class="mb-3">
 <ol class="breadcrumb bg-white p-0">
 <li class="breadcrumb-item"><a href="#">Home</a></li>
 <li class="breadcrumb-item text-capitalize"><a [routerLink]="['/category',product.category]">{{product.category}}</a></li>
@@ -18,11 +18,11 @@
        style="max-height:500px"
        [alt]="product.title"
      />
-<div class="d-flex gap-2 mt-2">
+<div class="d-flex gap-2 mt-2 ">
 <img
          *ngFor="let img of product.images"
          [src]="img"
-         class="img-thumbnail"
+         class="img-thumbnail "
          [class.border-container]="selectedImage === img"
          [style.background]="'#eee'"
          style="width:80px; height:80px; object-fit:cover; cursor:pointer; border:1px solid #0078ad"
@@ -126,7 +126,7 @@
 </div>
 
 <!-- In Stock Info -->
-<div *ngIf="product.stock <=10"><p class="text-danger mt-2">• Only {{product.stock}} items left!</p></div>
+<div *ngIf="product.stock <=10"><p class="text-danger mb-0">Only {{product.stock}} items left!</p></div>
 
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1055">
   <div #toastElem class="toast align-items-center text-bg-success opacity-100 text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -207,10 +207,12 @@
 </ng-template>
 </div>
 </div>
-<hr class="my-3">
+<hr class="my-5">
+  
   <app-similar-products
     *ngIf="product"    [category]="product.category"   [excludeProductId]="product.id">  </app-similar-products>
 </div>
+
 
 <ng-template #loadingTpl>
 <div class="text-center p-5 mt-5">

@@ -1,11 +1,13 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { ProductDetailService } from '../../services/product-detail-service'; 
+import { ProductDetailService } from '../../services/product-detail-service';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Product } from '../../models/product';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { SimilarProducts } from '../similar-products/similar-products';
 import { Wishlist } from '../../services/wishlist';
 import { WishlistItems } from '../../models/wishlist-items';
+import { CartService } from '../../services/cart-service';
 declare var bootstrap: any;
 
 @Component({
@@ -21,7 +23,12 @@ export class ProductDetail {
  quantityAdded:number=0;
  isInWishlist: boolean = false;
  wishlistItem: WishlistItems | undefined;
- constructor(private productService: ProductDetailService , private route: ActivatedRoute , private wishlist : Wishlist) {}
+   constructor(
+    private productService: ProductDetailService, 
+    private route: ActivatedRoute, 
+    private wishlist: Wishlist,
+    private cartService: CartService
+  ) {}
 
 
 ngOnInit(): void {
@@ -103,31 +110,73 @@ ngOnInit(): void {
     }
   }
 
-  addToCart(): void {
-    
-    if (this.product && this.quantityAdded === 0 && this.product.stock > 0) {
-      this.quantityAdded = 1;
-      this.showToast(); // Call showToast when item is added to cart
-    }
-  }
+    addToCart(): void {
+     if (this.product && this.quantityAdded === 0 && this.product.stock > 0) {
+       this.cartService.addToCart(this.product.id, 1).subscribe({
+         next: () => {
+           this.quantityAdded = 1;
+           this.showToast(); // Call showToast when item is added to cart
+           console.log('Product added to cart successfully');
+         },
+         error: (error) => {
+           console.error('Error adding to cart:', error);
+           alert('Failed to add to cart. Please try again.');
+         }
+       });
+     }
+   }
 
-  increaseQty(): void {
-    
-    if (this.product && this.quantityAdded < this.product.stock) {
-      this.quantityAdded++;
-    }
-  }
+    increaseQty(): void {
+     if (this.product && this.quantityAdded < this.product.stock) {
+       this.cartService.addToCart(this.product.id, 1).subscribe({
+         next: () => {
+           this.quantityAdded++;
+           console.log('Quantity increased in cart');
+         },
+         error: (error) => {
+           console.error('Error updating cart:', error);
+         }
+       });
+     }
+   }
 
-  decreaseQty(): void {
-    
-    if (this.product) { 
-      if (this.quantityAdded > 1) {
-        this.quantityAdded--;
-      } else {
-        this.quantityAdded = 0;
-      }
-    }
-  }
+   decreaseQty(): void {
+     if (this.product) { 
+       if (this.quantityAdded > 1) {
+         // Find the cart item and update quantity
+         this.cartService.cart$.subscribe(cart => {
+           const cartItem = cart.items.find(item => item.ProductID === this.product!.id);
+           if (cartItem && cartItem.id) {
+             this.cartService.updateQuantity(cartItem.id, this.quantityAdded - 1).subscribe({
+               next: () => {
+                 this.quantityAdded--;
+                 console.log('Quantity decreased in cart');
+               },
+               error: (error) => {
+                 console.error('Error updating cart:', error);
+               }
+             });
+           }
+         }).unsubscribe();
+       } else {
+         // Remove from cart
+         this.cartService.cart$.subscribe(cart => {
+           const cartItem = cart.items.find(item => item.ProductID === this.product!.id);
+           if (cartItem && cartItem.id) {
+             this.cartService.removeFromCart(cartItem.id).subscribe({
+               next: () => {
+                 this.quantityAdded = 0;
+                 console.log('Item removed from cart');
+               },
+               error: (error) => {
+                 console.error('Error removing from cart:', error);
+               }
+             });
+           }
+         }).unsubscribe();
+       }
+     }
+   }
 
 
   //handling wishlist toggle

@@ -1,0 +1,16 @@
+.cart-item {
+  transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+  background-color: #f8f9fa;
+}
+
+.cart-item img {
+  max-height: 80px;
+  object-fit: cover;
+}
+
+.quantity-controls {
+  min-width: 120px;
+} 

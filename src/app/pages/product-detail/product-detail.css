@@ -1,6 +1,11 @@
 .img-thumbnail.border-container {
  border-width: 3px !important;
+ 
+ 
+ 
 }
+
+
 
 .cts{
   background-color: var(--cts-blue);
