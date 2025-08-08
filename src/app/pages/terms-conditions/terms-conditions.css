@@ -1,0 +1,43 @@
+/* Theme classes will handle the coloring */
+
+.section-title {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.subsection {
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #e9ecef;
+}
+
+.terms-list {
+  padding-left: 1.5rem;
+}
+
+.terms-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.text-justify {
+  text-align: justify;
+  line-height: 1.6;
+}
+
+.contact-info {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .subsection {
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+  }
+} 

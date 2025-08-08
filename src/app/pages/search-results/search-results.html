@@ -1,0 +1,107 @@
+<div class="container my-4">
+  <!-- Search Header -->
+  <div class="search-header mb-4">
+    <h2 class="theme-major-element-color">Search Results</h2>
+    <p class="text-muted" *ngIf="searchQuery">
+      Showing results for: <strong>"{{ searchQuery }}"</strong>
+    </p>
+    <p class="text-muted" *ngIf="!loading && searchResults.length > 0">
+      Found {{ searchResults.length }} product{{ searchResults.length !== 1 ? 's' : '' }}
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="text-center my-5" *ngIf="loading">
+    <div class="spinner-border theme-major-element-color" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Searching products...</p>
+  </div>
+
+  <!-- No Results -->
+  <div class="no-results text-center my-5" *ngIf="!loading && noResults">
+    <div class="no-results-icon mb-3">
+      <i class="fas fa-search fa-4x text-muted"></i>
+    </div>
+    <h4 class="text-muted">No products found</h4>
+    <p class="text-muted" *ngIf="searchQuery">
+      We couldn't find any products matching "{{ searchQuery }}"
+    </p>
+    <p class="text-muted">Try searching with different keywords or browse our categories.</p>
+    <a routerLink="/category" class="btn btn-primary mt-3">
+      <i class="fas fa-th-large me-2"></i>
+      Browse Categories
+    </a>
+  </div>
+
+  <!-- Search Results -->
+  <div class="search-results" *ngIf="!loading && !noResults && searchResults.length > 0">
+    <div class="row">
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-4" *ngFor="let product of searchResults">
+        <div class="product-card h-100">
+          <a [routerLink]="['/product', product.id]" class="card-link">
+            <div class="card h-100 border-0 shadow-sm">
+              <!-- Product Image -->
+              <div class="card-img-top-container">
+                <img 
+                  [src]="product.thumbnail" 
+                  [alt]="product.title"
+                  class="card-img-top product-image"
+                  loading="lazy">
+                
+                <!-- Discount Badge -->
+                <div class="discount-badge" *ngIf="product.discountPercentage > 0">
+                  {{ product.discountPercentage }}% OFF
+                </div>
+              </div>
+
+              <!-- Product Details -->
+              <div class="card-body d-flex flex-column">
+                <h6 class="card-title product-title">{{ product.title }}</h6>
+                
+                <p class="product-brand text-muted small" *ngIf="product.brand">
+                  {{ product.brand }}
+                </p>
+
+                <!-- Rating -->
+                <div class="product-rating mb-2" *ngIf="product.rating">
+                  <div class="stars">
+                    <span *ngFor="let star of getRatingStars(product.rating)" 
+                          class="star"
+                          [class.full]="star === 'full'"
+                          [class.half]="star === 'half'"
+                          [class.empty]="star === 'empty'">
+                      <i class="fas fa-star" *ngIf="star === 'full'"></i>
+                      <i class="fas fa-star-half-alt" *ngIf="star === 'half'"></i>
+                      <i class="far fa-star" *ngIf="star === 'empty'"></i>
+                    </span>
+                  </div>
+                  <small class="text-muted ms-1">({{ product.rating }})</small>
+                </div>
+
+                <!-- Price -->
+                <div class="price-section mt-auto">
+                  <div class="price-current theme-major-element-color fw-bold">
+                    ₹{{ formatPrice(getDiscountedPrice(product)) }}
+                  </div>
+                  <div class="price-original text-muted text-decoration-line-through small" 
+                       *ngIf="product.discountPercentage > 0">
+                    ₹{{ formatPrice(product.price) }}
+                  </div>
+                </div>
+
+                <!-- Stock Status -->
+                <div class="stock-status mt-2">
+                  <span class="badge" 
+                        [class]="product.stock > 0 ? 'bg-success' : 'bg-danger'">
+                    {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

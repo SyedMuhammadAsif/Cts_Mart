@@ -12,6 +12,14 @@ import { OrderHistoryComponent } from './pages/order-history/order-history';
 import { OrderTrackingComponent } from './pages/order-tracking/order-tracking';
 import { CheckoutPaymentComponent } from './pages/checkout-payment/checkout-payment';
 import { CheckoutAddressComponent } from './pages/checkout-address/checkout-address';
+import { ManageProfile } from './pages/manage-profile/manage-profile';
+import { AuthGuard } from './services/auth-guard';
+import { AboutUs } from './pages/about-us/about-us';
+import { FAQ } from './pages/faq/faq';
+import { TermsConditions } from './pages/terms-conditions/terms-conditions';
+import { PrivacyPolicy } from './pages/privacy-policy/privacy-policy';
+import { EwastePolicy } from './pages/ewaste-policy/ewaste-policy';
+import { SearchResults } from './pages/search-results/search-results';
 
 export const routes: Routes = [
     {path: 'login', component: Login},
@@ -19,13 +27,20 @@ export const routes: Routes = [
     {path: 'home', component: Home},
     {path: 'category', component: Category},
     {path: 'category/:categoryName', component:ProductList},
+    {path: 'search', component: SearchResults},
     {path: 'product/:id', component: ProductDetail},
-    {path: 'wishlist', component: WishList},
-    {path: 'cart', component: CartComponent},
-    {path: 'checkout/address', component: CheckoutAddressComponent},
-    {path: 'checkout/payment', component: CheckoutPaymentComponent},
-    {path: 'order-tracking/:orderNumber', component: OrderTrackingComponent},
-    {path: 'orders', component: OrderHistoryComponent},
+    {path: 'wishlist', component: WishList, canActivate: [AuthGuard]},
+    {path: 'cart', component: CartComponent, canActivate: [AuthGuard]},
+    {path: 'checkout/address', component: CheckoutAddressComponent, canActivate: [AuthGuard]},
+    {path: 'checkout/payment', component: CheckoutPaymentComponent, canActivate: [AuthGuard]},
+    {path: 'order-tracking/:orderNumber', component: OrderTrackingComponent, canActivate: [AuthGuard]},
+    {path: 'orders', component: OrderHistoryComponent, canActivate: [AuthGuard]},
+    {path: 'manage-profile', component: ManageProfile, canActivate: [AuthGuard]},
+    {path: 'about-us', component: AboutUs},
+    {path: 'faq', component: FAQ},
+    {path: 'terms-conditions', component: TermsConditions},
+    {path: 'privacy-policy', component: PrivacyPolicy},
+    {path: 'ewaste-policy', component: EwastePolicy},
     {path: '', component: Home},
     {path: '**', component: NotFound}
 

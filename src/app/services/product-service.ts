@@ -73,6 +73,14 @@ idArrayFinal=this.idArraySource.asObservable();
 updateIDArray(ids:number[]){
 this.idArraySource.next(ids);
 }
+
+// Search results functionality
+private searchResultsSource = new BehaviorSubject<number[]>([]);
+searchResults = this.searchResultsSource.asObservable();
+
+setSearchResults(productIds: number[]): void {
+  this.searchResultsSource.next(productIds);
+}
   getCategory(){
     return this.http.get(this.api_URL);
   }

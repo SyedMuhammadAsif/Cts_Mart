@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Order } from '../../models/payment';
+import { UserAuth } from '../../services/user-auth';
 
 @Component({
   selector: 'app-order-history',
@@ -18,10 +19,17 @@ export class OrderHistoryComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private userAuth: UserAuth
   ) {}
 
   ngOnInit(): void {
+    // Check if user is logged in
+    if (!this.userAuth.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    
     this.loadOrders();
   }
 
@@ -29,10 +37,21 @@ export class OrderHistoryComponent implements OnInit {
     // Show loading state
     this.isLoading = true;
 
-    // Get orders from database
+    // Get current user ID
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Get orders from database filtered by user ID
     this.http.get<any[]>(`http://localhost:3000/orders`).toPromise()
       .then((orders) => {
-        this.orders = orders || [];
+        // Filter orders by current user
+        this.orders = (orders || []).filter(order => 
+          order.customerInfo && 
+          (order.customerInfo.userId === userId || order.userId === userId)
+        );
         
         // Sort orders by date (newest first)
         this.orders.sort((a, b) => {
@@ -41,7 +60,7 @@ export class OrderHistoryComponent implements OnInit {
           return dateB - dateA;
         });
         
-        console.log('Loaded orders:', this.orders);
+        console.log('Loaded orders for user:', userId, this.orders);
         this.isLoading = false;
       })
       .catch((error) => {
