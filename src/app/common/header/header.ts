@@ -65,10 +65,27 @@ export class Header implements OnInit, OnDestroy {
       const searchTerm = this.searchQuery.toLowerCase();
       
       const matchingProducts = products.filter((product: any) => {
+        // Search in product title
+        if (product.title && product.title.toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+        
+        // Search in product description
+        if (product.description && product.description.toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+        
+        // Search in product brand
+        if (product.brand && product.brand.toLowerCase().includes(searchTerm)) {
+          return true;
+        }
+        
+        // Search in category
         if (product.category && product.category.toLowerCase().includes(searchTerm)) {
           return true;
         }
         
+        // Search in tags
         if (product.tags && Array.isArray(product.tags)) {
           return product.tags.some((tag: string) => 
             tag.toLowerCase().includes(searchTerm)
@@ -79,14 +96,16 @@ export class Header implements OnInit, OnDestroy {
       });
 
       if (matchingProducts.length > 0) {
-        const firstProduct = matchingProducts[0];
-        if (firstProduct.category) {
-          this.router.navigate(['/category', firstProduct.category]);
-        } else {
-          alert('Product found but no category available');
-        }
+        // Pass the matching product IDs to the product service
+        const productIds = matchingProducts.map((product: any) => product.id);
+        this.productService.setSearchResults(productIds);
+        
+        // Navigate to search results page
+        this.router.navigate(['/search'], { 
+          queryParams: { q: this.searchQuery } 
+        });
       } else {
-        alert('No products found with tag or category: ' + this.searchQuery);
+        alert('No products found for: ' + this.searchQuery);
       }
     });
   }
@@ -130,5 +149,15 @@ export class Header implements OnInit, OnDestroy {
   }
   isLoggedIn() {
     return this.auth.isLoggedIn();
+  }
+
+  onAddressClick(): void {
+    if (this.auth.isLoggedIn()) {
+      // Navigate to manage-profile page with address section
+      this.router.navigate(['/manage-profile'], { fragment: 'address' });
+    } else {
+      // Redirect to login page
+      this.router.navigate(['/login']);
+    }
   }
 } 

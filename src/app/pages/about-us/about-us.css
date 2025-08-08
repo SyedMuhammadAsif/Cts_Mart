@@ -1,0 +1,21 @@
+/* Theme classes will handle the coloring */
+
+.value-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.value-card h4 {
+  color: var(--primary, #0078ad);
+}
+
+.text-justify {
+  text-align: justify;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2rem;
+  }
+} 

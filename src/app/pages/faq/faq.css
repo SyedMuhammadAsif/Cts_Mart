@@ -1,0 +1,73 @@
+/* Theme classes will handle the coloring */
+
+.category-title {
+  border-bottom: 2px solid #0078ad;
+  padding-bottom: 0.5rem;
+}
+
+.accordion-item {
+  border: 1px solid #e9ecef;
+  margin-bottom: 0.5rem;
+}
+
+.accordion-header {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.accordion-header.active {
+  background-color: #0078ad;
+  color: white;
+}
+
+.accordion-title {
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.accordion-icon {
+  font-size: 0.9rem;
+}
+
+.accordion-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+}
+
+.accordion-content.show {
+  max-height: 200px;
+}
+
+.accordion-body {
+  padding: 1rem;
+  background-color: white;
+  line-height: 1.6;
+}
+
+.contact-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2rem;
+  }
+  
+  .accordion-header {
+    padding: 0.75rem;
+  }
+  
+  .accordion-body {
+    padding: 0.75rem;
+  }
+} 
