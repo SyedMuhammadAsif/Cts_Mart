@@ -178,9 +178,8 @@ export class ProductList implements OnInit {
     }
     
     const loadBatch = async (batch: number[]) => {
-      const requests = batch.map(id => 
-        this.productService.getProductById(id).toPromise()
-      );
+      const { firstValueFrom } = await import('rxjs');
+      const requests = batch.map(id => firstValueFrom(this.productService.getProductById(id)));
       return Promise.all(requests);
     };
     

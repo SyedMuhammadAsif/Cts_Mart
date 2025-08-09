@@ -1,5 +1,8 @@
-<app-header />
+<!-- Customer Navigation - Hide on Admin Pages -->
+<app-header *ngIf="!isAdminPage" />
 
+<!-- Main Content -->
 <router-outlet />
 
-<app-footer />
+<!-- Customer Footer - Hide on Admin Pages -->
+<app-footer *ngIf="!isAdminPage" />

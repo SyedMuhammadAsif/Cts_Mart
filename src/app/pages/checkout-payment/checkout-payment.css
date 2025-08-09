@@ -159,3 +159,26 @@
   color: #9ca3af !important;
   font-style: italic;
 } 
+
+.checkout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1050;
+}
+
+.overlay-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  width: min(90vw, 360px);
+}
+
+.success-tick {
+  animation: popIn 220ms ease-out;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+} 

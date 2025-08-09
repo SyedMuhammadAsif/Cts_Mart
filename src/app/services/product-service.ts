@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { EnvVariables } from '../env/env-variables';
 
 // Interface for the API response when fetching products by category
 export interface ProductApiResponse {
   products: any[];
-  total: number;
-  skip: number;
-  limit: number;
+  total?: number;
+  skip?: number;
+  limit?: number;
 }
 
 
@@ -53,77 +55,68 @@ export class ProductService {
 
   constructor(private http:HttpClient){}
 
-   private api_categories_url = 'https://dummyjson.com/products/categories';
-  private api_category_base_url = 'https://dummyjson.com/products/category';
+  private baseUrl = `${EnvVariables.apiBaseUrl}`;
 
-  api_URL:string="https://dummyjson.com/products/categories";
-  //returns only categories, name,slum,products url
-
-  api_product:string='https://dummyjson.com/products';
- 
-  api_category:string="https://dummyjson.com/products/category"; 
- 
-//It give the products category, that is categorry/smartphone
-
-
-private idArraySource=new BehaviorSubject<number[]>([]);
-
-idArrayFinal=this.idArraySource.asObservable();
-
-updateIDArray(ids:number[]){
-this.idArraySource.next(ids);
-}
-
-// Search results functionality
-private searchResultsSource = new BehaviorSubject<number[]>([]);
-searchResults = this.searchResultsSource.asObservable();
-
-setSearchResults(productIds: number[]): void {
-  this.searchResultsSource.next(productIds);
-}
-  getCategory(){
-    return this.http.get(this.api_URL);
+  // Local state for selections/search
+  private idArraySource=new BehaviorSubject<number[]>([]);
+  idArrayFinal=this.idArraySource.asObservable();
+  updateIDArray(ids:number[]){
+    this.idArraySource.next(ids);
   }
 
+  // Search results functionality
+  private searchResultsSource = new BehaviorSubject<number[]>([]);
+  searchResults = this.searchResultsSource.asObservable();
+  setSearchResults(productIds: number[]): void {
+    this.searchResultsSource.next(productIds);
+  }
 
-  //It gives the products in the category
-  //slug should given as parameter to this.
+  // Categories from local products, shaped as { name, slug }
+  getCategories(): Observable<{ name: string; slug: string; }[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/products`).pipe(
+      map(products => {
+        const unique = Array.from(new Set((products || []).map(p => p.category).filter(Boolean)));
+        return unique.map((slug: string) => ({ name: this.titleCase(slug), slug }));
+      })
+    );
+  }
 
-  getCategoryProducts(category:string){
-     return this.http.get(`${this.api_category}/${category}`);
+  // Back-compat alias used by some components
+  getCategory(): Observable<{ name: string; slug: string; }[]> {
+    return this.getCategories();
+  }
+
+  // Products list shaped to { products } to match existing consumers
+  getProducts(): Observable<ProductApiResponse> {
+    return this.http.get<any[]>(`${this.baseUrl}/products`).pipe(
+      map(products => ({ products }))
+    );
+  }
+
+  // Get products by category slug, shaped to { products }
+  getProductsByCategory(categorySlug: string): Observable<ProductApiResponse> {
+    return this.http.get<any[]>(`${this.baseUrl}/products`).pipe(
+      map(products => ({ products: (products || []).filter(p => p.category === categorySlug) }))
+    );
+  }
+
+  // Back-compat alias
+  getCategoryProducts(category:string): Observable<ProductApiResponse> {
+    return this.getProductsByCategory(category);
   }
 
   getCategoryImages(index:number){
-   return this.images[index];
-   
+    return this.images[index];
   }
 
   getProductById(id:number){
-    return this.http.get(`${this.api_product}/${id}`);
+    return this.http.get(`${this.baseUrl}/products/${id}`);
   }
 
-   getProducts(): Observable<any> {
-    return this.http.get(`${this.api_product}?limit=200`);
-  }
-
-  //get method to get brands based on products.
-
-
-  /**
-   * Fetches the list of all product category names.
-   * The API returns an array of strings.
-   * @returns An Observable with an array of category strings.
-   */
-  getCategories(): Observable<string[]> {
-    return this.http.get<string[]>(this.api_categories_url);
-  }
-
-  /**
-   * Fetches all products for a specific category slug.
-   * @param categorySlug - The slug of the category (e.g., 'smartphones').
-   * @returns An Observable with the response containing products.
-   */
-  getProductsByCategory(categorySlug: string): Observable<ProductApiResponse> {
-    return this.http.get<ProductApiResponse>(`${this.api_category_base_url}/${categorySlug}`);
+  private titleCase(input: string): string {
+    return (input || '')
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }

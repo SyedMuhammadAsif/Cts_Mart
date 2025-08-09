@@ -75,73 +75,72 @@
               <p class="text-muted">Update your personal details</p>
             </div>
             
-            @if (!editingAccount) {
-              <div class="info-grid">
-                <div class="info-item">
-                  <label>Full Name</label>
-                  <span>{{ user.name || 'Not provided' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Email</label>
-                  <span>{{ user.email || 'Not provided' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Phone</label>
-                  <span>{{ user.phone || 'Not provided' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Date of Birth</label>
-                  <span>{{ user.dateOfBirth || 'Not provided' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Gender</label>
-                  <span>{{ user.gender || 'Not provided' }}</span>
-                </div>
-              </div>
-              <button class="btn btn-outline-secondary btn-sm" (click)="startEditingAccount()">
-                <i class="fas fa-edit me-1"></i>Edit
-              </button>
-            } @else {
-              <form (ngSubmit)="saveAccountInfo()" class="edit-form">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="name">Full Name *</label>
-                    <input type="text" class="form-control" id="name" 
-                           [(ngModel)]="tempAccountData.name" name="name" required>
+                          @if (!editingAccount) {
+                <div class="info-grid">
+                  <div class="info-item">
+                    <label>Full Name</label>
+                    <span>{{ user.name || 'Not provided' }}</span>
                   </div>
-                  <div class="form-group">
-                    <label for="email">Email *</label>
-                    <input type="email" class="form-control" id="email" 
-                           [(ngModel)]="tempAccountData.email" name="email" required>
+                  <div class="info-item">
+                    <label>Email</label>
+                    <span>{{ user.email || 'Not provided' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label>Phone</label>
+                    <span>{{ user.phone || 'Not provided' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label>Date of Birth</label>
+                    <span>{{ user.dateOfBirth || 'Not provided' }}</span>
+                  </div>
+                  <div class="info-item">
+                    <label>Gender</label>
+                    <span>{{ user.gender || 'Not provided' }}</span>
                   </div>
                 </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="tel" class="form-control" id="phone" 
-                           [(ngModel)]="tempAccountData.phone" name="phone">
+                <button class="btn btn-outline-secondary btn-sm" (click)="startEditingAccount()">
+                  <i class="fas fa-edit me-1"></i>Edit
+                </button>
+              } @else {
+                <form [formGroup]="accountForm" (ngSubmit)="saveAccountInfo()" class="edit-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="name">Full Name *</label>
+                      <input type="text" class="form-control" id="name" formControlName="name">
+                      <small class="text-danger" *ngIf="accountForm.get('name')?.touched && accountForm.get('name')?.invalid">Name is required (min 3 chars)</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="email">Email *</label>
+                      <input type="email" class="form-control" id="email" formControlName="email">
+                      <small class="text-danger" *ngIf="accountForm.get('email')?.touched && accountForm.get('email')?.invalid">Valid email required</small>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="phone">Phone</label>
+                      <input type="tel" class="form-control" id="phone" formControlName="phone">
+                      <small class="text-danger" *ngIf="accountForm.get('phone')?.touched && accountForm.get('phone')?.invalid">Phone must be 10 digits</small>
+                    </div>
+                    <div class="form-group">
+                      <label for="dateOfBirth">Date of Birth</label>
+                      <input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth">
+                    </div>
                   </div>
                   <div class="form-group">
-                    <label for="dateOfBirth">Date of Birth</label>
-                    <input type="date" class="form-control" id="dateOfBirth" 
-                           [(ngModel)]="tempAccountData.dateOfBirth" name="dateOfBirth">
+                    <label for="gender">Gender</label>
+                    <select class="form-control" id="gender" formControlName="gender">
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
-                </div>
-                <div class="form-group">
-                  <label for="gender">Gender</label>
-                  <select class="form-control" id="gender" [(ngModel)]="tempAccountData.gender" name="gender">
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-dark btn-sm">Save</button>
-                  <button type="button" class="btn btn-light btn-sm" (click)="cancelEditingAccount()">Cancel</button>
-                </div>
-              </form>
-            }
+                  <div class="form-actions">
+                    <button [disabled]="accountForm.invalid || accountForm.pristine" type="submit" class="btn btn-dark btn-sm">Save</button>
+                    <button type="button" class="btn btn-light btn-sm" (click)="cancelEditingAccount()">Cancel</button>
+                  </div>
+                </form>
+              }
           </div>
         }
 
@@ -190,55 +189,54 @@
                 </div>
               }
             } @else {
-              <form (ngSubmit)="saveAddress()" class="edit-form">
+              <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="edit-form">
                 <div class="form-row">
                   <div class="form-group">
                     <label for="fullName">Full Name *</label>
-                    <input type="text" class="form-control" id="fullName" 
-                           [(ngModel)]="tempAddressData.fullName" name="fullName" required>
+                    <input type="text" class="form-control" id="fullName" formControlName="fullName">
+                    <small class="text-danger" *ngIf="addressForm.get('fullName')?.touched && addressForm.get('fullName')?.invalid">Full name is required (min 3 chars)</small>
                   </div>
                   <div class="form-group">
                     <label for="addressPhone">Phone *</label>
-                    <input type="tel" class="form-control" id="addressPhone" 
-                           [(ngModel)]="tempAddressData.phone" name="addressPhone" required>
+                    <input type="tel" class="form-control" id="addressPhone" formControlName="phone">
+                    <small class="text-danger" *ngIf="addressForm.get('phone')?.touched && addressForm.get('phone')?.invalid">Phone must be 10 digits</small>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="addressLine1">Address Line 1 *</label>
-                  <input type="text" class="form-control" id="addressLine1" 
-                         [(ngModel)]="tempAddressData.addressLine1" name="addressLine1" required>
+                  <input type="text" class="form-control" id="addressLine1" formControlName="addressLine1">
+                  <small class="text-danger" *ngIf="addressForm.get('addressLine1')?.touched && addressForm.get('addressLine1')?.invalid">Address Line 1 is required</small>
                 </div>
                 <div class="form-group">
                   <label for="addressLine2">Address Line 2</label>
-                  <input type="text" class="form-control" id="addressLine2" 
-                         [(ngModel)]="tempAddressData.addressLine2" name="addressLine2">
+                  <input type="text" class="form-control" id="addressLine2" formControlName="addressLine2">
                 </div>
                 <div class="form-row">
                   <div class="form-group">
                     <label for="city">City *</label>
-                    <input type="text" class="form-control" id="city" 
-                           [(ngModel)]="tempAddressData.city" name="city" required>
+                    <input type="text" class="form-control" id="city" formControlName="city">
+                    <small class="text-danger" *ngIf="addressForm.get('city')?.touched && addressForm.get('city')?.invalid">City is required</small>
                   </div>
                   <div class="form-group">
                     <label for="state">State *</label>
-                    <input type="text" class="form-control" id="state" 
-                           [(ngModel)]="tempAddressData.state" name="state" required>
+                    <input type="text" class="form-control" id="state" formControlName="state">
+                    <small class="text-danger" *ngIf="addressForm.get('state')?.touched && addressForm.get('state')?.invalid">State is required</small>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group">
                     <label for="postalCode">Postal Code *</label>
-                    <input type="text" class="form-control" id="postalCode" 
-                           [(ngModel)]="tempAddressData.postalCode" name="postalCode" required>
+                    <input type="text" class="form-control" id="postalCode" formControlName="postalCode">
+                    <small class="text-danger" *ngIf="addressForm.get('postalCode')?.touched && addressForm.get('postalCode')?.invalid">Pincode must be 6 digits</small>
                   </div>
                   <div class="form-group">
                     <label for="country">Country *</label>
-                    <input type="text" class="form-control" id="country" 
-                           [(ngModel)]="tempAddressData.country" name="country" required>
+                    <input type="text" class="form-control" id="country" formControlName="country">
+                    <small class="text-danger" *ngIf="addressForm.get('country')?.touched && addressForm.get('country')?.invalid">Country is required</small>
                   </div>
                 </div>
                 <div class="form-actions">
-                  <button type="submit" class="btn btn-dark btn-sm">Save Address</button>
+                  <button [disabled]="addressForm.invalid || addressForm.pristine" type="submit" class="btn btn-dark btn-sm">Save Address</button>
                   <button type="button" class="btn btn-light btn-sm" (click)="cancelEditingAddress()">Cancel</button>
                 </div>
               </form>

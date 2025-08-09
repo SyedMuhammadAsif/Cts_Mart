@@ -9,6 +9,8 @@ import { ToastService } from '../../services/toast-service';
 import { Address } from '../../models/address';
 import { PaymentMethod, Order, OrderResponse, PaymentType } from '../../models/payment';
 import { Cart } from '../../models/cart-items';
+import { User, UserPaymentMethod } from '../../models/user';
+import { DataPersistenceService } from '../../services/data-persistence.service';
 
 @Component({
   selector: 'app-checkout-payment',
@@ -22,12 +24,19 @@ export class CheckoutPaymentComponent implements OnInit {
   shippingAddress: Address | null = null;
   isProcessing = false;
   orderNum:string='';
+  currentUser: User | null = null;
   
   // Selected payment method type
   selectedPaymentType: PaymentType = 'card';
   
   // Simple reactive form - beginner friendly!
   paymentForm: any;
+  
+  // Overlay state
+  isOverlayVisible = false;
+  overlayStage: 'loading' | 'success' = 'loading';
+  overlayTitle = '';
+  overlaySubtitle = '';
   
   payment: PaymentMethod = {
     type: 'card',
@@ -53,7 +62,8 @@ export class CheckoutPaymentComponent implements OnInit {
     private http: HttpClient,
     private toastService: ToastService,
     private ngZone: NgZone,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private dataPersistence: DataPersistenceService
   ) {
     // Generate years (current year + 10 years)
     const currentYear = new Date().getFullYear();
@@ -72,6 +82,9 @@ export class CheckoutPaymentComponent implements OnInit {
       cvv: [''],
       upiId: ['']
     });
+
+    // Load current user data
+    this.loadCurrentUser();
 
     // Load cart data
     this.cartService.cart$.subscribe(cart => {
@@ -95,6 +108,86 @@ export class CheckoutPaymentComponent implements OnInit {
     this.shippingAddress = JSON.parse(savedAddress);
   }
 
+  /**
+   * Load current user data to check existing payment methods
+   */
+  private loadCurrentUser(): void {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.http.get<User[]>(`http://localhost:3000/users?user_id=${userId}`).subscribe({
+        next: (users) => {
+          if (users.length > 0) {
+            this.currentUser = users[0];
+            console.log('Current user loaded:', this.currentUser);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading current user:', error);
+        }
+      });
+    }
+  }
+
+  /**
+   * Check if the entered card details match any existing payment method
+   * @param cardDetails - The card details to validate
+   * @returns boolean - true if card details match existing ones, false otherwise
+   */
+  private validateExistingCardDetails(cardDetails: any): boolean {
+    if (!this.currentUser?.paymentMethods) {
+      return false; // No existing payment methods
+    }
+
+    const existingCard = this.currentUser.paymentMethods.find(method => 
+      method.type === 'card' &&
+      method.cardNumber?.replace(/\s/g, '') === cardDetails.cardNumber &&
+      method.expiryMonth === cardDetails.expiryMonth &&
+      method.expiryYear === cardDetails.expiryYear &&
+      method.cardholderName?.toLowerCase() === cardDetails.cardholderName?.toLowerCase()
+    );
+
+    return !!existingCard;
+  }
+
+  /**
+   * Save new payment method to user's account
+   * @param paymentMethod - The payment method to save
+   */
+  private saveNewPaymentMethod(paymentMethod: UserPaymentMethod): void {
+    if (!this.currentUser) {
+      return;
+    }
+
+    // Initialize paymentMethods array if it doesn't exist
+    if (!this.currentUser.paymentMethods) {
+      this.currentUser.paymentMethods = [];
+    }
+
+    // Add unique ID and timestamp to the payment method
+    const newPaymentMethod: UserPaymentMethod = {
+      ...paymentMethod,
+      id: Date.now().toString(),
+      isDefault: this.currentUser.paymentMethods.length === 0 // First payment method is default
+    };
+
+    // Add to user's payment methods
+    this.currentUser.paymentMethods.push(newPaymentMethod);
+
+    // Update user in database
+    this.http.patch(`http://localhost:3000/users/${this.currentUser.id}`, {
+      paymentMethods: this.currentUser.paymentMethods
+    }).subscribe({
+      next: () => {
+        console.log('New payment method saved successfully');
+        this.toastService.showSuccess('Payment method saved for future use');
+      },
+      error: (error) => {
+        console.error('Error saving payment method:', error);
+        // Don't show error to user as payment still processed successfully
+      }
+    });
+  }
+
   // Simple form submission - easy to understand!
   onSubmit(): void {
     if (!this.isProcessing) {
@@ -116,6 +209,37 @@ export class CheckoutPaymentComponent implements OnInit {
             !this.payment.expiryMonth || !this.payment.expiryYear || !this.payment.cvv) {
           isValid = false;
           errorMessage = 'Please fill in all card details';
+        } else {
+          // Validate card details against existing user payment methods
+          const cardDetailsForValidation = {
+            cardNumber: this.payment.cardNumber.replace(/\s/g, ''), // Remove spaces for comparison
+            expiryMonth: this.payment.expiryMonth,
+            expiryYear: this.payment.expiryYear,
+            cardholderName: this.payment.cardholderName
+          };
+          
+          const isExistingCard = this.validateExistingCardDetails(cardDetailsForValidation);
+          
+          if (!isExistingCard && this.currentUser && this.currentUser.paymentMethods && this.currentUser.paymentMethods.length > 0) {
+            // This is a new card and user has existing saved methods - show warning
+            const proceed = confirm(
+              'This card is different from your saved payment methods.\n\n' +
+              'Do you want to proceed with this new card? It will be saved to your account for future use.\n\n' +
+              'Click OK to continue or Cancel to go back and use a saved method.'
+            );
+            
+            if (!proceed) {
+              return; // User cancelled, stop the submission
+            }
+            
+            console.log('User confirmed to proceed with new card details');
+          } else if (isExistingCard) {
+            console.log('Existing card details matched - proceeding with payment');
+          } else if (!this.currentUser) {
+            console.log('User not logged in - proceeding as guest payment');
+          } else if (!this.currentUser.paymentMethods || this.currentUser.paymentMethods.length === 0) {
+            console.log('User has no saved payment methods - proceeding with new card');
+          }
         }
       } else if (this.selectedPaymentType === 'upi') {
         if (!this.payment.upiId) {
@@ -124,6 +248,32 @@ export class CheckoutPaymentComponent implements OnInit {
         } else if (!this.isValidUPI(this.payment.upiId)) {
           isValid = false;
           errorMessage = 'UPI ID must end with @gpay, @phonepe, or @paytm';
+        } else {
+          // Validate UPI ID against existing user payment methods
+          if (this.currentUser && this.currentUser.paymentMethods && this.currentUser.paymentMethods.length > 0) {
+            const existingUPI = this.currentUser.paymentMethods.find(method => 
+              method.type === 'upi' && method.upiId === this.payment.upiId
+            );
+            
+            if (!existingUPI) {
+              // This is a new UPI ID and user has existing saved methods - show warning
+              const proceed = confirm(
+                'This UPI ID is different from your saved payment methods.\n\n' +
+                'Do you want to proceed with this new UPI ID? It will be saved to your account for future use.\n\n' +
+                'Click OK to continue or Cancel to go back and use a saved method.'
+              );
+              
+              if (!proceed) {
+                return; // User cancelled, stop the submission
+              }
+              
+              console.log('User confirmed to proceed with new UPI ID');
+            } else {
+              console.log('Existing UPI ID matched - proceeding with payment');
+            }
+          } else {
+            console.log('User has no saved payment methods - proceeding with new UPI ID');
+          }
         }
       }
       // COD doesn't need any fields
@@ -163,7 +313,7 @@ export class CheckoutPaymentComponent implements OnInit {
     // Step 1: Create an array of promises to check stock for each cart item
     const stockCheckPromises = this.cart.items.map(cartItem => {
       // Get the current product details from the database
-      return this.http.get<any>(`http://localhost:3000/products/${cartItem.ProductID}`).toPromise()
+      return import('rxjs').then(({ firstValueFrom }) => firstValueFrom(this.http.get<any>(`http://localhost:3000/products/${cartItem.ProductID}`)))
         .then(product => {
           // Return an object with stock information for this item
           return {
@@ -204,12 +354,20 @@ export class CheckoutPaymentComponent implements OnInit {
     // Show loading state to prevent multiple submissions
     this.isProcessing = true;
 
+    // Show overlay with appropriate loading message
+    this.isOverlayVisible = true;
+    this.overlayStage = 'loading';
+    const isPaid = this.payment.type !== 'cod';
+    this.overlayTitle = isPaid ? 'Processing Payment…' : 'Placing Order…';
+    this.overlaySubtitle = isPaid ? 'Do not close this window' : 'Please wait while we confirm your order';
+
     // Step 1: Create the order object with all necessary information
     const order: Order = {
       orderNumber: this.generateOrderNumber(),
+      userId: localStorage.getItem('userId') || undefined,
       customerInfo: {
         fullName: this.shippingAddress!.fullName,
-        email: this.shippingAddress!.email,
+        email: this.currentUser ? this.currentUser.email : this.shippingAddress!.email,
         phone: this.shippingAddress!.phone
       },
       shippingAddress: this.shippingAddress!,
@@ -237,40 +395,52 @@ export class CheckoutPaymentComponent implements OnInit {
         console.log('💾 Save order response:', orderResponse);
         if (orderResponse.success) {
   
+          // Step 3.5: Save new payment method if user is logged in and it's a new method
+          this.savePaymentMethodIfNew();
        
-          console.log('✅ Payment successful, order saved');
+          console.log('✅ Payment/Order successful, order saved');
           
-          // Step 4: Show success toast message
-          this.toastService.showSuccess('Payment successful! Your order has been placed.', 6000);
+          // Update overlay to success state
+          this.overlayStage = 'success';
+          if (isPaid) {
+            this.overlayTitle = 'Payment Successful';
+            this.overlaySubtitle = 'Your order has been placed';
+          } else {
+            this.overlayTitle = 'Order Placed';
+            this.overlaySubtitle = 'Pay cash on delivery';
+          }
           
-          // Step 5: Clean up session storage
+          // Optional toast (kept brief)
+          if (isPaid) {
+            this.toastService.showSuccess('Payment successful! Your order has been placed.', 4000);
+          } else {
+            this.toastService.showSuccess('Order placed. Pay cash on delivery.', 4000);
+          }
+          
+          // Clean up session storage
           sessionStorage.removeItem('checkoutAddress');
           console.log('🧹 Session storage cleaned');
           
-          // Step 6: Navigate to order tracking page with order number IMMEDIATELY
-          console.log('🚀 About to navigate to order tracking with order number:', order.orderNumber);
-          console.log('🚀 Navigation route will be:', ['/order-tracking', order.orderNumber]);
-          
-          // Use the dedicated Angular navigation method
-          setTimeout(() => {
-            this.navigateToOrderTracking(order.orderNumber!);
-          }, 100);
-          
-          // Step 7: Clear the shopping cart (do this after navigation to prevent blocking)
-          this.cartService.clearCart().subscribe({
-            next: () => {
+          // Clear the shopping cart first, then navigate
+          import('rxjs').then(({ firstValueFrom }) => firstValueFrom(this.cartService.clearCart()))
+            .then(() => {
               console.log(' Cart cleared successfully');
-            },
-            error: (error) => {
+              setTimeout(() => {
+                this.navigateToOrderTracking(order.orderNumber!);
+              }, 900);
+            })
+            .catch((error) => {
               console.error(' Error clearing cart:', error);
-              // Navigation already happened, so this won't block the user
-            }
-          });
+              setTimeout(() => {
+                this.navigateToOrderTracking(order.orderNumber!);
+              }, 900);
+            });
            
         } else {
           // Payment failed - show error message
           console.error(' Payment failed:', orderResponse.message);
           this.toastService.showError('Payment failed. Please try again.');
+          this.isOverlayVisible = false;
         }
         
         // Always hide the loading state
@@ -280,8 +450,57 @@ export class CheckoutPaymentComponent implements OnInit {
         console.error(' Payment processing error:', error);
         this.toastService.showError('Payment failed. Please try again.');
         this.isProcessing = false;
+        this.isOverlayVisible = false;
       });
-    }, 2000); // 2-second delay to simulate payment processing
+    }, 1200); // brief delay to simulate processing
+  }
+
+  /**
+   * Save payment method if it's new and user is logged in
+   */
+  private savePaymentMethodIfNew(): void {
+    if (!this.currentUser) {
+      return; // User not logged in, skip saving
+    }
+
+    if (this.selectedPaymentType === 'card') {
+      const cardDetailsForValidation = {
+        cardNumber: this.payment.cardNumber?.replace(/\s/g, '') || '', // Remove spaces for comparison
+        expiryMonth: this.payment.expiryMonth || '',
+        expiryYear: this.payment.expiryYear || '',
+        cardholderName: this.payment.cardholderName || ''
+      };
+      
+      const isExistingCard = this.validateExistingCardDetails(cardDetailsForValidation);
+      
+      if (!isExistingCard) {
+        // Save new card details
+        const newCardMethod: UserPaymentMethod = {
+          type: 'card',
+          cardNumber: cardDetailsForValidation.cardNumber,
+          cardholderName: cardDetailsForValidation.cardholderName,
+          expiryMonth: cardDetailsForValidation.expiryMonth,
+          expiryYear: cardDetailsForValidation.expiryYear
+        };
+        
+        this.saveNewPaymentMethod(newCardMethod);
+      }
+    } else if (this.selectedPaymentType === 'upi') {
+      const existingUPI = this.currentUser.paymentMethods?.find(method => 
+        method.type === 'upi' && method.upiId === this.payment.upiId
+      );
+      
+      if (!existingUPI && this.payment.upiId) {
+        // Save new UPI details
+        const newUPIMethod: UserPaymentMethod = {
+          type: 'upi',
+          upiId: this.payment.upiId
+        };
+        
+        this.saveNewPaymentMethod(newUPIMethod);
+      }
+    }
+    // COD doesn't need to be saved as it's not a reusable payment method
   }
 
   /**
@@ -290,29 +509,43 @@ export class CheckoutPaymentComponent implements OnInit {
    * @returns Promise<OrderResponse> - Success/failure response
    */
   private saveOrder(order: Order): Promise<OrderResponse> {
-    // Send the order to the database
-    return this.http.post<Order>('http://localhost:3000/orders', order).toPromise()
-      .then((response) => {
-        console.log('✅ Order saved successfully:', response?.orderNumber);
-        
-        // Update stock levels for all products in this order
-        this.updateProductStock(order.items);
-        
-        // Return success response
-        return {
-          success: true,
-          order: response,
-          trackingNumber: response?.orderNumber
-        };
-      })
-      .catch((error) => {
-        // Handle any errors when saving the order
-        console.error('❌ Error saving order:', error);
-        return {
-          success: false,
-          message: 'Failed to save order'
-        };
+    // Use data persistence service to ensure order is saved
+    return new Promise((resolve, reject) => {
+      this.dataPersistence.ensureDataPersistence(
+        this.http.post<Order>('http://localhost:3000/orders', order)
+      ).subscribe({
+        next: (response) => {
+          console.log('✅ Order saved successfully with persistence verification:', response?.orderNumber);
+          
+                     // Stock already adjusted via cart operations; no double-reduction here.
+           
+           // Verify the order was actually saved by fetching it back
+          this.http.get<Order[]>(`http://localhost:3000/orders?orderNumber=${order.orderNumber}`).subscribe({
+            next: (savedOrders) => {
+              if (savedOrders.length > 0) {
+                console.log('✅ Order verified in database:', savedOrders[0]);
+                resolve({
+                  success: true,
+                  order: response,
+                  trackingNumber: response?.orderNumber
+                });
+              } else {
+                console.error('❌ Order not found in database after save');
+                reject(new Error('Order not persisted to database'));
+              }
+            },
+            error: (verifyError) => {
+              console.error('❌ Error verifying order persistence:', verifyError);
+              reject(verifyError);
+            }
+          });
+        },
+        error: (error) => {
+          console.error('❌ Error saving order:', error);
+          reject(error);
+        }
       });
+    });
   }
 
   /**

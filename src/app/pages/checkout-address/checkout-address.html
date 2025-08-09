@@ -6,13 +6,39 @@
         <div class="card-header">
           <h4 class="mb-0">
             <svg width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
-              <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/>
+              <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5  15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/>
             </svg>
             Shipping Address
           </h4>
         </div>
         <div class="card-body">
-          <form #addressForm="ngForm" (ngSubmit)="onSubmit(addressForm)" novalidate>
+          <!-- Saved addresses selection -->
+          <div *ngIf="userAddresses.length > 0" class="mb-4">
+            <h6 class="fw-bold">Select a saved address</h6>
+            <div class="list-group">
+              <label class="list-group-item" *ngFor="let a of userAddresses">
+                <input class="form-check-input me-2" type="radio" name="savedAddress" [value]="a.id" [checked]="selectedAddressId===a.id" (change)="onAddressChoiceChange(a.id!)">
+                <div>
+                  <div class="fw-semibold">{{ a.fullName }} • {{ a.phone }}</div>
+                  <div class="small text-muted">
+                    {{ a.addressLine1 }}
+                    <span *ngIf="a.addressLine2">, {{ a.addressLine2 }}</span>,
+                    {{ a.city }}, {{ a.state }} {{ a.postalCode }}
+                  </div>
+                </div>
+              </label>
+            </div>
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="radio" id="useNew" name="savedAddress" value="new" [checked]="selectedAddressId==='new'" (change)="onAddressChoiceChange('new')">
+              <label class="form-check-label" for="useNew">Use a new address</label>
+            </div>
+            <div class="d-flex mt-3">
+              <button class="btn btn-primary" type="button" [disabled]="!selectedAddressId || selectedAddressId==='new'" (click)="useSelectedAddress()">Use selected address</button>
+            </div>
+            <hr>
+          </div>
+
+          <form *ngIf="useNewAddress || userAddresses.length===0" #addressForm="ngForm" (ngSubmit)="onSubmit(addressForm)" novalidate>
             <!-- Personal Information -->
             <div class="row mb-3">
               <div class="col-md-6">
@@ -24,10 +50,13 @@
                   name="fullName"
                   [(ngModel)]="address.fullName"
                   required
+                  minlength="5"
                   #fullName="ngModel"
-                  [class.is-invalid]="fullName.invalid && fullName.touched">
+                  [class.is-invalid]="fullName.invalid && fullName.touched"
+                  placeholder="Enter your full name (min 5 characters)">
                 <div class="invalid-feedback" *ngIf="fullName.invalid && fullName.touched">
-                  Full name is required
+                  <span *ngIf="fullName.errors?.['required']">Full name is required</span>
+                  <span *ngIf="fullName.errors?.['minlength']">Full name must be at least 5 characters</span>
                 </div>
               </div>
               <div class="col-md-6">
@@ -60,11 +89,15 @@
                   name="phone"
                   [(ngModel)]="address.phone"
                   required
+                  pattern="[0-9]{10}"
+                  maxlength="10"
                   #phone="ngModel"
                   [class.is-invalid]="phone.invalid && phone.touched"
-                  placeholder="(555) 123-4567">
+                  placeholder="1234567890 (10 digits only)"
+                  (input)="formatPhoneNumber($event)">
                 <div class="invalid-feedback" *ngIf="phone.invalid && phone.touched">
-                  Phone number is required
+                  <span *ngIf="phone.errors?.['required']">Phone number is required</span>
+                  <span *ngIf="phone.errors?.['pattern']">Phone number must be exactly 10 digits</span>
                 </div>
               </div>
             </div>
@@ -141,11 +174,15 @@
                   name="postalCode"
                   [(ngModel)]="address.postalCode"
                   required
+                  pattern="[0-9]{6}"
+                  maxlength="6"
                   #postalCode="ngModel"
                   [class.is-invalid]="postalCode.invalid && postalCode.touched"
-                  placeholder="12345">
+                  placeholder="123456 (6 digits only)"
+                  (input)="formatZipCode($event)">
                 <div class="invalid-feedback" *ngIf="postalCode.invalid && postalCode.touched">
-                  ZIP code is required
+                  <span *ngIf="postalCode.errors?.['required']">ZIP code is required</span>
+                  <span *ngIf="postalCode.errors?.['pattern']">ZIP code must be exactly 6 digits</span>
                 </div>
               </div>
             </div>
