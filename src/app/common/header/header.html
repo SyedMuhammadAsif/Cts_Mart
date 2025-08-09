@@ -47,6 +47,8 @@
         <li class="nav-item mx-2">
           <a class="nav-link text-light" routerLink="/orders">Orders</a>
         </li>
+        <!-- Admin Login Dropdown -->
+        
         <li class="nav-item mx-2">
           <app-user-profile />
         </li>
@@ -63,8 +65,8 @@
         <a class="nav-link text-light d-flex flex-row align-items-center" (click)="onAddressClick()" style="cursor: pointer;">
           Address:
           <div class="d-flex flex-column align-items-center ml-2">
-            <div class="font-weight-bold" style="font-size: 85%">Chennai</div>
-            <div class="small">400020</div>
+            <div class="font-weight-bold" style="font-size: 85%">{{ addressDisplay }}</div>
+            <div class="small">{{ pincodeDisplay }}</div>
           </div>
         </a>
       </li>
@@ -72,7 +74,7 @@
 
     <ul class="navbar-nav ml-auto d-flex flex-row align-items-center">
       <li class="nav-item mx-2">
-        <a class="nav-link text-light border rounded p-2" style="font-size: 75%;" href="#">Delivery within 10 Minutes</a>
+        <a class="nav-link text-light border rounded p-2" style="font-size: 75%;" routerLink="/delivery-policy">Delivery within 10 Minutes</a>
       </li>
       <li class="nav-item mx-2">
         <a class="nav-link text-light d-flex flex-row align-items-center" href="#">

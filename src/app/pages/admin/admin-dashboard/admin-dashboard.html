@@ -1,0 +1,247 @@
+<!-- Admin Dashboard Header with CTS Blue Styling -->
+<div class="admin-header theme-major-color text-light">
+  <div class="container-fluid py-3">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <div class="d-flex align-items-center">
+          <img 
+            src="megamart-logo.jpeg" 
+            width="50" 
+            height="50" 
+            class="rounded me-3" 
+            alt="MegaMart Admin Logo">
+          <div>
+            <h2 class="mb-0">MegaMart Admin Dashboard</h2>
+            <small class="text-light">Administrator Panel</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 text-end">
+        <app-admin-nav></app-admin-nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Spinner -->
+<div *ngIf="isLoading" class="text-center py-5">
+  <div class="spinner-border theme-text-color" role="status">
+    <span class="visually-hidden">Loading dashboard...</span>
+  </div>
+  <p class="mt-3">Loading dashboard data...</p>
+</div>
+
+<!-- Dashboard Content -->
+<div *ngIf="!isLoading" class="container-fluid py-4">
+  
+
+  <!-- Statistics Cards Row -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <svg width="40" height="40" fill="currentColor" class="mb-2" viewBox="0 0 16 16">
+            <path d="M4.502 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM6 10.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-.812-8.505a6.002 6.002 0 0 1 9.98 5.05.5.5 0 0 1-.99.16A5.002 5.002 0 0 0 6.15 3.02a.5.5 0 0 1 .038-.525z"/>
+          </svg>
+          <h3 class="mb-1">{{ stats.totalProducts }}</h3>
+          <p class="mb-0">Total Products</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <svg width="40" height="40" fill="currentColor" class="mb-2" viewBox="0 0 16 16">
+            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5z"/>
+          </svg>
+          <h3 class="mb-1">{{ stats.totalOrders }}</h3>
+          <p class="mb-0">Total Orders</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <svg width="40" height="40" fill="currentColor" class="mb-2" viewBox="0 0 16 16">
+            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022z"/>
+          </svg>
+          <h3 class="mb-1">{{ stats.totalCustomers }}</h3>
+          <p class="mb-0">Total Customers</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <svg width="40" height="40" fill="currentColor" class="mb-2" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+          </svg>
+          <h3 class="mb-1">{{ formatCurrency(stats.totalRevenue) }}</h3>
+          <p class="mb-0">Total Revenue</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs Row -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <div class="dashboard-kpi-title">Ordered</div>
+          <h3 class="mb-0">{{ orderedOrders }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <div class="dashboard-kpi-title">Shipped</div>
+          <h3 class="mb-0">{{ stats.shippedOrders }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <div class="dashboard-kpi-title">Delivered</div>
+          <h3 class="mb-0">{{ stats.deliveredOrders }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card theme-minor-color text-light">
+        <div class="card-body text-center">
+          <div class="dashboard-kpi-title">Pending Orders</div>
+          <h3 class="mb-0">{{ stats.pendingOrders }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Status Overview + Charts Row -->
+  <div class="row mb-4">
+    <div class="col-lg-4 mb-3">
+      <div class="card order-status-card">
+        <div class="card-body text-center">
+          <div class="status-icon pending mb-2">
+            <svg width="30" height="30" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+            </svg>
+          </div>
+          <h4 class="text-warning">{{ stats.pendingOrders }}</h4>
+          <p class="mb-0">Pending Orders</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+      <div class="card order-status-card" style="height: 220px;">
+        <div class="card-header"><h5 class="mb-0">Status Mix</h5></div>
+        <div class="card-body" style="height: 180px;">
+          <canvas baseChart [type]="'bar'" [data]="statusBarData" [options]="barChartOptions"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+      <div class="card order-status-card" style="height: 220px;">
+        <div class="card-header"><h5 class="mb-0">Stock Availability</h5></div>
+        <div class="card-body" style="height: 180px;">
+          <canvas baseChart [type]="'doughnut'" [data]="stockDoughnutData" [options]="doughnutOptions"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Sales and Profit (with charts) -->
+  <div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Monthly Sales</h5>
+        </div>
+        <div class="card-body" style="height: 260px;">
+          <div *ngIf="monthlySales.length === 0" class="text-center text-muted">No data</div>
+          <div *ngIf="monthlySales.length > 0" style="height: 220px">
+            <canvas baseChart [type]="'line'" [data]="salesChartData" [options]="lineChartOptions"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Monthly Profit</h5>
+        </div>
+        <div class="card-body" style="height: 260px;">
+          <div *ngIf="monthlySales.length === 0" class="text-center text-muted">No data</div>
+          <div *ngIf="monthlySales.length > 0" style="height: 220px">
+            <canvas baseChart [type]="'line'" [data]="profitChartData" [options]="lineChartOptions"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Row -->
+  <div class="row">
+    <!-- Recent Orders -->
+    <div class="col-md-8 mb-4">
+      <div class="card">
+        <div class="card-header theme-major-color text-light">
+          <h5 class="mb-0">
+            <svg width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+              <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+            Recent Orders
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center mb-3">
+            <div class="col-3"><small>Shipped</small><div class="fw-bold">{{ percent(stats.shippedOrders, stats.totalOrders) }}%</div></div>
+            <div class="col-3"><small>Delivered</small><div class="fw-bold">{{ percent(stats.deliveredOrders, stats.totalOrders) }}%</div></div>
+            <div class="col-3"><small>Cancelled</small><div class="fw-bold">{{ percent(cancelledOrders, stats.totalOrders) }}%</div></div>
+            <div class="col-3"><small>Ordered</small><div class="fw-bold">{{ percent(orderedOrders, stats.totalOrders) }}%</div></div>
+          </div>
+          <div *ngIf="recentOrders.length === 0" class="text-center py-4">
+            <p class="text-muted">No orders found</p>
+          </div>
+          <div *ngIf="recentOrders.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of recentOrders">
+                  <td><strong>{{ order.orderNumber }}</strong></td>
+                  <td>{{ order.customerInfo?.fullName }}</td>
+                  <td>{{ formatDate(order.orderDate) }}</td>
+                  <td>{{ formatCurrency(order.total) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(order.orderStatus)">
+                      {{ order.orderStatus | titlecase }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div> 

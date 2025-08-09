@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Order } from '../../models/payment';
-import { PaymentToastComponent } from '../../pages/payment-toast/payment-toast';
+import { firstValueFrom } from 'rxjs';
+import { Order, OrderTracking } from '../../models/payment';
+import { OrderProcessingService } from '../../services/order-processing.service';
+import { PaymentToastComponent } from '../payment-toast/payment-toast';
 
 @Component({
   selector: 'app-order-tracking',
@@ -19,16 +21,21 @@ export class OrderTrackingComponent implements OnInit {
   error: string = '';
 
   trackingSteps = [
-    { id: 'confirmed', title: 'Order Confirmed', description: 'We have received your order', completed: false },
-    { id: 'processing', title: 'Processing', description: 'Your order is being prepared', completed: false },
-    { id: 'shipped', title: 'Shipped', description: 'Your order is on its way', completed: false },
-    { id: 'delivered', title: 'Delivered', description: 'Your order has been delivered', completed: false }
+    { id: 'confirmed', title: 'Order Confirmed', description: 'We have received your order', completed: false, current: false },
+    { id: 'processing', title: 'Processing', description: 'Your order is being prepared', completed: false, current: false },
+    { id: 'shipped', title: 'Shipped', description: 'Your order is on its way', completed: false, current: false },
+    { id: 'delivered', title: 'Delivered', description: 'Your order has been delivered', completed: false, current: false }
   ];
+
+  // Enhanced tracking information
+  trackingHistory: OrderTracking[] = [];
+  showTrackingHistory = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private orderProcessing: OrderProcessingService
   ) {
     console.log('🏗️ OrderTrackingComponent constructor called');
   }
@@ -58,7 +65,7 @@ export class OrderTrackingComponent implements OnInit {
 
     // Get all orders from database
     console.log('🌐 Making HTTP request to: http://localhost:3000/orders');
-    this.http.get<Order[]>(`http://localhost:3000/orders`).toPromise()
+    firstValueFrom(this.http.get<Order[]>(`http://localhost:3000/orders`))
       .then((orders) => {
         console.log('📥 Received orders from API:', orders);
         // Find the specific order by order number
@@ -69,6 +76,8 @@ export class OrderTrackingComponent implements OnInit {
           console.log('✅ Order found, updating tracking steps...');
           // Update the tracking steps based on order status
           this.updateTrackingSteps();
+          // Load enhanced tracking history
+          this.loadTrackingHistory();
         } else {
           console.log('❌ Order not found');
           this.error = 'Order not found';
@@ -98,8 +107,56 @@ export class OrderTrackingComponent implements OnInit {
     const currentStatusIndex = statusMap[this.order.orderStatus] || 0;
     
     this.trackingSteps.forEach((step, index) => {
-      step.completed = index <= currentStatusIndex;
+      // Reset current status
+      step.current = false;
+      
+      // Only mark steps as completed if they are BEFORE the current status
+      // The current step should not be marked as completed until it's actually done
+      step.completed = index < currentStatusIndex;
+      
+      // Mark current step
+      if (index === currentStatusIndex) {
+        step.current = true;
+        // Update description for current step
+        step.description = this.getCurrentStepDescription(step.id);
+      }
+      
+      // Special case: if status is 'delivered', mark all steps as completed
+      if (this.order?.orderStatus === 'delivered') {
+        step.completed = true;
+        step.current = false;
+      }
     });
+    
+    console.log(`📊 Updated tracking steps for status: ${this.order.orderStatus}`);
+    console.log(`📋 Current status index: ${currentStatusIndex}`);
+    this.trackingSteps.forEach((step, index) => {
+      console.log(`  Step ${index} (${step.id}): ${step.completed ? '✅' : '⏳'}`);
+    });
+  }
+
+  /**
+   * Load enhanced tracking history
+   */
+  private loadTrackingHistory(): void {
+    if (!this.order?.id) return;
+    
+    this.orderProcessing.getOrderTracking(this.order.id).subscribe({
+      next: (history) => {
+        this.trackingHistory = history;
+        console.log('✅ Tracking history loaded:', history);
+      },
+      error: (error) => {
+        console.error('❌ Error loading tracking history:', error);
+      }
+    });
+  }
+
+  /**
+   * Toggle tracking history display
+   */
+  toggleTrackingHistory(): void {
+    this.showTrackingHistory = !this.showTrackingHistory;
   }
 
   continueShopping(): void {
@@ -139,5 +196,18 @@ export class OrderTrackingComponent implements OnInit {
       'cancelled': 'danger'
     };
     return colors[status] || 'secondary';
+  }
+
+  /**
+   * Get dynamic description for current step
+   */
+  private getCurrentStepDescription(stepId: string): string {
+    const descriptions: { [key: string]: string } = {
+      'confirmed': 'Your order is confirmed and being processed',
+      'processing': 'Your order is currently being prepared for shipping',
+      'shipped': 'Your order is on its way to you',
+      'delivered': 'Your order has been successfully delivered'
+    };
+    return descriptions[stepId] || 'Processing your order';
   }
 } 

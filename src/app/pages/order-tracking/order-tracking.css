@@ -96,8 +96,33 @@
 
 .tracking-step.completed .step-indicator::after {
   background-color: #198754;
- 
+}
 
+/* Remove the blue animation from the step number itself */
+.tracking-step.current .step-number {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #6c757d;
+}
+
+.tracking-step.current .step-title {
+  color: #495057;
+  font-weight: 600;
+}
+
+.tracking-step.current .step-content {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 6px;
+  margin-left: -6px;
+  border-left: 2px solid #6c757d;
+}
+
+/* Remove the confusing blue indicator completely */
+
+/* Keep the connecting line normal for current step */
+.tracking-step.current .step-indicator::after {
+  background-color: #dee2e6;
 }
 
 .tracking-step.current .step-number {
@@ -198,6 +223,51 @@
   font-weight: 300;
 }
 
+/* Detailed Timeline Styles */
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #dee2e6;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -22px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-content {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 3px solid #0d6efd;
+}
+
+.timeline-content h6 {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .tracking-step {
@@ -216,5 +286,19 @@
   
   .step-content {
     padding-top: 5px;
+  }
+  
+  .timeline {
+    padding-left: 20px;
+  }
+  
+  .timeline::before {
+    left: 10px;
+  }
+  
+  .timeline-marker {
+    left: -17px;
+    width: 10px;
+    height: 10px;
   }
 } 

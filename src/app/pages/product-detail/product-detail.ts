@@ -115,6 +115,8 @@ ngOnInit(): void {
        this.cartService.addToCart(this.product.id, 1).subscribe({
          next: () => {
            this.quantityAdded = 1;
+           // Decrease local stock so bindings like "Only X left" update immediately
+           if (this.product) { this.product.stock = Math.max(0, (this.product.stock || 0) - 1); }
            this.showToast(); // Call showToast when item is added to cart
            console.log('Product added to cart successfully');
          },
@@ -127,10 +129,11 @@ ngOnInit(): void {
    }
 
     increaseQty(): void {
-     if (this.product && this.quantityAdded < this.product.stock) {
+     if (this.product && this.quantityAdded < this.product.stock + this.quantityAdded) {
        this.cartService.addToCart(this.product.id, 1).subscribe({
          next: () => {
            this.quantityAdded++;
+           if (this.product) { this.product.stock = Math.max(0, (this.product.stock || 0) - 1); }
            console.log('Quantity increased in cart');
          },
          error: (error) => {
@@ -150,6 +153,7 @@ ngOnInit(): void {
              this.cartService.updateQuantity(cartItem.id, this.quantityAdded - 1).subscribe({
                next: () => {
                  this.quantityAdded--;
+                 if (this.product) { this.product.stock = (this.product.stock || 0) + 1; }
                  console.log('Quantity decreased in cart');
                },
                error: (error) => {
@@ -160,12 +164,14 @@ ngOnInit(): void {
          }).unsubscribe();
        } else {
          // Remove from cart
+         const qtyToReturn = this.quantityAdded;
          this.cartService.cart$.subscribe(cart => {
            const cartItem = cart.items.find(item => item.ProductID === this.product!.id);
            if (cartItem && cartItem.id) {
              this.cartService.removeFromCart(cartItem.id).subscribe({
                next: () => {
                  this.quantityAdded = 0;
+                 if (this.product) { this.product.stock = (this.product.stock || 0) + qtyToReturn; }
                  console.log('Item removed from cart');
                },
                error: (error) => {

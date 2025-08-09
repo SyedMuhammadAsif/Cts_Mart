@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ManageProfileService } from '../../services/manage-profile.service';
 import { ToastService } from '../../services/toast-service';
 import { User, UserAddress, UserPaymentMethod, PasswordResetRequest } from '../../models/user';
+import { AddressStateService } from '../../services/address-state.service';
 
 @Component({
   selector: 'app-manage-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './manage-profile.html',
   styleUrls: ['./manage-profile.css']
 })
@@ -45,11 +46,33 @@ export class ManageProfile implements OnInit {
   showDeleteAccountModal = false;
   showResetPasswordModal = false;
 
+  // Reactive form for address editing
+  addressForm: FormGroup = new FormGroup({
+    fullName: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    phone: new FormControl('', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]),
+    addressLine1: new FormControl('', [Validators.required, Validators.minLength(5)]),
+    addressLine2: new FormControl(''),
+    city: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    state: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    postalCode: new FormControl('', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]),
+    country: new FormControl('', [Validators.required, Validators.minLength(2)])
+  });
+
+  // Reactive form for account editing
+  accountForm: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    phone: new FormControl('', [Validators.pattern(/^[0-9]{10}$/)]),
+    dateOfBirth: new FormControl(''),
+    gender: new FormControl('')
+  });
+
   constructor(
     private manageProfileService: ManageProfileService,
     private toastService: ToastService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private addressState: AddressStateService
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +92,34 @@ export class ManageProfile implements OnInit {
       next: (user) => {
         this.user = user;
         this.loading = false;
+        
+        // Seed account form with user data
+        this.accountForm.patchValue({
+          name: this.user.name,
+          email: this.user.email,
+          phone: this.user.phone || '',
+          dateOfBirth: this.user.dateOfBirth || '',
+          gender: this.user.gender || ''
+        });
+        
+        // Seed address form with default or first address if exists
+        const addr = (this.user.addresses && this.user.addresses.length > 0) ? this.user.addresses[0] : null;
+        if (addr) {
+          this.addressForm.patchValue({
+            fullName: addr.fullName || this.user.name,
+            phone: addr.phone || this.user.phone || '',
+            addressLine1: addr.addressLine1,
+            addressLine2: addr.addressLine2 || '',
+            city: addr.city,
+            state: addr.state,
+            postalCode: addr.postalCode,
+            country: addr.country
+          });
+          // Broadcast address to header on load as well
+          this.addressState.setAddressInfo({ city: addr.city, postalCode: addr.postalCode });
+        } else {
+          this.addressState.setAddressInfo(null);
+        }
       },
       error: (error) => {
         this.toastService.showError('Error loading profile: ' + error.message);
@@ -80,22 +131,30 @@ export class ManageProfile implements OnInit {
   // Account Information Methods
   startEditingAccount(): void {
     this.editingAccount = true;
-    this.tempAccountData = {
+    // Ensure form is up to date with user data when entering edit mode
+    this.accountForm.patchValue({
       name: this.user.name,
       email: this.user.email,
       phone: this.user.phone || '',
       dateOfBirth: this.user.dateOfBirth || '',
       gender: this.user.gender || ''
-    };
+    });
   }
 
   saveAccountInfo(): void {
+    if (this.accountForm.invalid) {
+      this.accountForm.markAllAsTouched();
+      this.toastService.showError('Please correct the errors in the profile form');
+      return;
+    }
+
+    const payload = this.accountForm.value as Partial<User>;
+
     this.loading = true;
-    this.manageProfileService.updateAccountInfo(this.tempAccountData).subscribe({
+    this.manageProfileService.updateAccountInfo(payload).subscribe({
       next: (updatedUser) => {
-        this.user = { ...this.user, ...this.tempAccountData };
+        this.user = { ...this.user, ...payload } as User;
         this.editingAccount = false;
-        this.tempAccountData = {};
         this.toastService.showSuccess('Account information updated successfully');
         this.loading = false;
       },
@@ -108,7 +167,6 @@ export class ManageProfile implements OnInit {
 
   cancelEditingAccount(): void {
     this.editingAccount = false;
-    this.tempAccountData = {};
   }
 
   // Address Methods
@@ -116,32 +174,61 @@ export class ManageProfile implements OnInit {
     this.editingAddress = true;
     if (address) {
       this.selectedAddress = address;
-      this.tempAddressData = { ...address };
+      this.addressForm.reset({
+        fullName: address.fullName || this.user.name,
+        phone: address.phone || this.user.phone || '',
+        addressLine1: address.addressLine1,
+        addressLine2: address.addressLine2 || '',
+        city: address.city,
+        state: address.state,
+        postalCode: address.postalCode,
+        country: address.country,
+      });
     } else {
       this.selectedAddress = null;
-      this.tempAddressData = {
+      this.addressForm.reset({
         fullName: this.user.name,
+        phone: this.user.phone || '',
         addressLine1: '',
         addressLine2: '',
         city: '',
         state: '',
         postalCode: '',
-        country: '',
-        phone: this.user.phone || ''
-      } as UserAddress;
+        country: ''
+      });
     }
   }
 
   saveAddress(): void {
+    if (this.addressForm.invalid) {
+      this.addressForm.markAllAsTouched();
+      this.toastService.showError('Please correct the errors in the address form');
+      return;
+    }
+
+    const formValue = this.addressForm.value;
+    const updated: UserAddress = {
+      ...(this.selectedAddress ? { id: this.selectedAddress.id } : {}),
+      fullName: formValue.fullName,
+      addressLine1: formValue.addressLine1,
+      addressLine2: formValue.addressLine2,
+      city: formValue.city,
+      state: formValue.state,
+      postalCode: formValue.postalCode,
+      country: formValue.country,
+      phone: formValue.phone
+    } as UserAddress;
+
     this.loading = true;
-    this.manageProfileService.updateAddress(this.tempAddressData).subscribe({
+    this.manageProfileService.updateAddress(updated).subscribe({
       next: (updatedUser) => {
-        this.loadUserProfile(); // Reload to get updated addresses
+        this.loadUserProfile();
         this.editingAddress = false;
-        this.tempAddressData = {} as UserAddress;
         this.selectedAddress = null;
         this.toastService.showSuccess('Address updated successfully');
         this.loading = false;
+        // Broadcast to header immediately
+        this.addressState.setAddressInfo({ city: updated.city, postalCode: updated.postalCode });
       },
       error: (error) => {
         this.toastService.showError('Error updating address: ' + error.message);
@@ -152,7 +239,6 @@ export class ManageProfile implements OnInit {
 
   cancelEditingAddress(): void {
     this.editingAddress = false;
-    this.tempAddressData = {} as UserAddress;
     this.selectedAddress = null;
   }
 
@@ -164,6 +250,11 @@ export class ManageProfile implements OnInit {
           this.loadUserProfile();
           this.toastService.showSuccess('Address removed successfully');
           this.loading = false;
+          // If we removed the only address, clear the header display
+          const remaining = (this.user.addresses || []).filter(a => a.id !== addressId);
+          if (remaining.length === 0) {
+            this.addressState.setAddressInfo(null);
+          }
         },
         error: (error) => {
           this.toastService.showError('Error removing address: ' + error.message);

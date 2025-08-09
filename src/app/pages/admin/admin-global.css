@@ -1,0 +1,765 @@
+/* Admin Global Styles - Responsive Design & Consistent Colors */
+:root {
+  --admin-font-size-base: 14px;
+  --admin-heading-size: 1.1rem;
+}
+
+.admin-header h2,
+.card h5,
+.dashboard-kpi-title {
+  font-size: var(--admin-heading-size);
+}
+
+body, .card, .table, .btn, .form-control {
+  font-size: var(--admin-font-size-base);
+}
+
+.dashboard-kpi-title {
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+
+/* ===== ADMIN HEADER - CONSISTENT ACROSS ALL PAGES ===== */
+.admin-header {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+  color: white !important;
+  padding: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 3px solid #1e3a8a;
+}
+
+.admin-header h2 {
+  color: white !important;
+  margin: 0;
+  font-weight: 600;
+}
+
+.admin-header small {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ===== ADMIN NAVIGATION - CONSISTENT STYLING ===== */
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.admin-nav .btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
+.admin-nav .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-light {
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-light:hover {
+  background-color: white !important;
+  color: #1e40af !important;
+  border-color: white !important;
+}
+
+.btn-outline-danger {
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: white !important;
+}
+
+.btn-light {
+  background-color: white !important;
+  border-color: white !important;
+  color: #1e40af !important;
+}
+
+.btn-light:hover {
+  background-color: #f8fafc !important;
+  border-color: #f8fafc !important;
+  color: #1e40af !important;
+}
+
+/* ===== CARD STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+  color: #0f172a !important; /* dark slate */
+  background-color: #e2e8f0 !important; /* fallback */
+  border-bottom: none;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 1.2rem 1.5rem;
+  font-weight: 600;
+}
+
+.card-header h5 { color: #0f172a !important; }
+
+/* ===== BUTTON STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-primary {
+  color: #1e40af !important;
+  border-color: #1e40af !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #1e40af !important;
+  border-color: #1e40af !important;
+  color: white !important;
+}
+
+.btn-outline-danger {
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: white !important;
+}
+
+.btn-outline-info {
+  color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-info:hover {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.btn-outline-success {
+  color: #10b981 !important;
+  border-color: #10b981 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-success:hover {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: white !important;
+}
+
+.btn-secondary {
+  background-color: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: white !important;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563 !important;
+  border-color: #4b5563 !important;
+  color: white !important;
+}
+
+/* ===== FORM STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #1e40af !important;
+  box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25) !important;
+}
+
+.form-label {
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* ===== BADGE STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+.badge-warning {
+  background-color: #f59e0b !important;
+  color: white !important;
+}
+
+.badge-danger {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.badge-info {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.badge-secondary {
+  background-color: #6b7280 !important;
+  color: white !important;
+}
+
+/* ===== TABLE STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.table {
+  margin-bottom: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #f8fafc !important;
+  border-top: none;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  padding: 1rem 0.75rem;
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #f3f4f6;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* ===== ALERT STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.alert {
+  border-radius: 8px;
+  border: none;
+  padding: 1rem 1.25rem;
+}
+
+.alert-success {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.alert-danger {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.alert-warning {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.alert-info {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+/* ===== PAGINATION STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-link {
+  color: #1e40af !important;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin: 0 2px;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: #1e40af !important;
+  border-color: #1e40af !important;
+  color: white !important;
+}
+
+.page-item.active .page-link {
+  background-color: #1e40af !important;
+  border-color: #1e40af !important;
+  color: white !important;
+}
+
+.page-item.disabled .page-link {
+  color: #9ca3af !important;
+  background-color: #f9fafb !important;
+  border-color: #e5e7eb !important;
+}
+
+/* ===== MODAL STYLING - CONSISTENT ACROSS ALL PAGES ===== */
+.modal-content {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+  color: white !important;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+  border-radius: 0 0 10px 10px;
+}
+
+/* ===== LOADING SPINNER - CONSISTENT ACROSS ALL PAGES ===== */
+.spinner-border {
+  color: #1e40af !important;
+}
+
+/* ===== ACTION BUTTONS - RESPONSIVE DESIGN ===== */
+.btn-group-sm .btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  margin: 0 2px;
+  border-radius: 4px;
+  min-width: 60px;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-group-sm .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.btn-group .btn {
+  border-radius: 4px !important;
+}
+
+/* ===== RESPONSIVE DESIGN - GLOBAL BREAKPOINTS ===== */
+
+/* Large Desktop (1200px+) */
+@media (max-width: 1200px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .card-body {
+    padding: 1.25rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Desktop (992px - 1199px) */
+@media (max-width: 992px) {
+  .container-fluid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .row {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+  }
+  
+  .col-lg-4, .col-lg-8 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Tablet (768px - 991px) */
+@media (max-width: 768px) {
+  .admin-header .row {
+    text-align: center;
+    flex-direction: column;
+  }
+  
+  .admin-header .col-md-6:first-child {
+    margin-bottom: 1rem;
+  }
+  
+  .admin-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .admin-header small {
+    font-size: 0.875rem;
+  }
+  
+  .admin-nav {
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  .admin-nav .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    margin: 0.2rem;
+  }
+  
+  .container-fluid {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .form-control, .form-select {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    min-width: 50px;
+  }
+  
+  .btn-group {
+    gap: 2px;
+  }
+  
+  .modal-dialog {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .pagination .page-link {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Large (576px - 767px) */
+@media (max-width: 576px) {
+  .admin-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .admin-header small {
+    font-size: 0.8rem;
+  }
+  
+  .admin-nav {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .admin-nav .btn {
+    width: 100%;
+    margin: 0.1rem 0;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+  
+  .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .form-control, .form-select {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-group-sm .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
+    min-width: 45px;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 1px;
+  }
+  
+  .btn-group .btn {
+    width: 100%;
+    margin: 0;
+  }
+  
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  
+  .modal-body {
+    padding: 0.75rem;
+  }
+  
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .pagination .page-link {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ===== THEME COLORS - CONSISTENT ACROSS ALL PAGES ===== */
+.theme-major-color {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%) !important;
+}
+
+.theme-text-color {
+  color: #1e40af !important;
+}
+
+.theme-minor-color {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-primary {
+  color: #1e40af !important;
+}
+
+.bg-primary {
+  background-color: #1e40af !important;
+}
+
+.border-primary {
+  border-color: #1e40af !important;
+}
+
+/* ===== SPECIFIC ADMIN PAGE STYLES ===== */
+
+/* Products Page Specific */
+.product-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.product-title {
+  max-width: 250px;
+  word-wrap: break-word;
+}
+
+.product-title strong {
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+.price-info {
+  min-width: 80px;
+}
+
+/* Settings Page Specific */
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.profile-info p {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  margin: 0;
+}
+
+.profile-info strong {
+  display: inline-block;
+  min-width: 100px;
+  color: #374151;
+}
+
+/* Orders Page Specific */
+.order-status-badge {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS FOR SPECIFIC ELEMENTS ===== */
+
+@media (max-width: 768px) {
+  .product-thumbnail {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .product-title {
+    max-width: 120px;
+  }
+  
+  .price-info {
+    min-width: 50px;
+  }
+  
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  
+  .profile-info strong {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .product-thumbnail {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .product-title {
+    max-width: 100px;
+  }
+  
+  .price-info {
+    min-width: 40px;
+  }
+  
+  .profile-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+  
+  .profile-info strong {
+    min-width: 70px;
+    font-size: 0.85rem;
+  }
+} 

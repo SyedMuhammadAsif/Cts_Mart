@@ -270,3 +270,22 @@
     </div>
   </div>
 </div> 
+
+<!-- Simple payment/COD overlay -->
+<div *ngIf="isOverlayVisible" class="checkout-overlay d-flex align-items-center justify-content-center">
+  <div class="overlay-card text-center p-4">
+    <div *ngIf="overlayStage === 'loading'" class="mb-3">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+    </div>
+    <div *ngIf="overlayStage === 'success'" class="mb-3">
+      <div class="success-tick">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="2" fill="rgba(16,185,129,0.1)"/>
+          <path d="M7 12l3 3 7-7" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <h5 class="mb-1">{{ overlayTitle }}</h5>
+    <small class="text-muted">{{ overlaySubtitle }}</small>
+  </div>
+</div> 

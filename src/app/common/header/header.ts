@@ -7,6 +7,10 @@ import { ProductService } from '../../services/product-service';
 import { CartService } from '../../services/cart-service';
 import { UserProfile } from '../../pages/user-profile/user-profile';
 import { UserAuth } from '../../services/user-auth';
+import { AdminAuthService } from '../../services/admin-auth.service';
+import { Admin, AdminLoginData } from '../../models/admin';
+import { AddressStateService, AddressInfoState } from '../../services/address-state.service';
+import { ManageProfileService } from '../../services/manage-profile.service';
 
 @Component({
   selector: 'app-header',
@@ -19,6 +23,13 @@ export class Header implements OnInit, OnDestroy {
   cartCount: number = 0;
   private subscription = new Subscription();
   
+  // Admin-related properties
+  adminLoginData: AdminLoginData = {
+    email: '',
+    password: ''
+  };
+  currentAdmin: Admin | null = null;
+  
   isSidebarOpen = false;
   wishlistCount = 2;
   categoryName: string = '';
@@ -27,11 +38,17 @@ export class Header implements OnInit, OnDestroy {
   idArray: number[] = [];
   categories: any = [];
 
+  // Address display state
+  addressInfo: AddressInfoState | null = null;
+
   constructor(
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
-    private auth: UserAuth
+    private auth: UserAuth,
+    public adminAuth: AdminAuthService,
+    private addressState: AddressStateService,
+    private manageProfileService: ManageProfileService
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +62,37 @@ export class Header implements OnInit, OnDestroy {
     });
     this.subscription.add(cartSub);
 
-    this.productService.getCategory().subscribe(res => {
+    // Subscribe to admin authentication changes
+    const adminSub = this.adminAuth.currentAdmin$.subscribe(admin => {
+      this.currentAdmin = admin;
+    });
+    this.subscription.add(adminSub);
+
+    // Subscribe to address changes
+    const addrSub = this.addressState.addressInfo$.subscribe(info => {
+      this.addressInfo = info;
+    });
+    this.subscription.add(addrSub);
+
+    // Seed initial address if user is logged in and no address broadcast yet
+    if (this.auth.isLoggedIn()) {
+      this.manageProfileService.getUserProfile().subscribe({
+        next: (user) => {
+          const addr = (user.addresses && user.addresses.length > 0) ? user.addresses[0] : null;
+          if (addr) {
+            const info = { city: addr.city, postalCode: addr.postalCode } as AddressInfoState;
+            this.addressState.setAddressInfo(info);
+          } else {
+            this.addressState.setAddressInfo(null);
+          }
+        },
+        error: () => {
+          this.addressState.setAddressInfo(null);
+        }
+      });
+    }
+
+    this.productService.getCategory().subscribe((res: { name: string; slug: string; }[]) => {
       this.categories = res;
       console.log(this.categories);
     });
@@ -53,6 +100,17 @@ export class Header implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  get addressDisplay(): string {
+    if (this.addressInfo && this.addressInfo.city && this.addressInfo.postalCode) {
+      return `${this.addressInfo.city}`;
+    }
+    return 'no address is provided by user';
+  }
+
+  get pincodeDisplay(): string {
+    return this.addressInfo?.postalCode || '';
   }
 
   onSearch(): void {
@@ -149,6 +207,37 @@ export class Header implements OnInit, OnDestroy {
   }
   isLoggedIn() {
     return this.auth.isLoggedIn();
+  }
+
+  // Admin authentication methods
+  isAdminLoggedIn(): boolean {
+    return this.adminAuth.isLoggedIn();
+  }
+
+  onAdminLogin(): void {
+    if (!this.adminLoginData.email || !this.adminLoginData.password) {
+      alert('Please enter both email and password');
+      return;
+    }
+
+    this.adminAuth.login(this.adminLoginData).subscribe({
+      next: (admin) => {
+        console.log('Admin login successful:', admin);
+        // Clear the form
+        this.adminLoginData = { email: '', password: '' };
+        // Navigate to admin dashboard
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: (error) => {
+        console.error('Admin login error:', error);
+        alert('Invalid admin credentials. Please try again.');
+      }
+    });
+  }
+
+  onAdminLogout(): void {
+    this.adminAuth.logout();
+    this.router.navigate(['/']);
   }
 
   onAddressClick(): void {

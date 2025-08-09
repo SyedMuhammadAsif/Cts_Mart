@@ -1,0 +1,17 @@
+.policy-header h1 {
+  letter-spacing: 0.5px;
+}
+
+.value-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 49, 83, 0.12);
+  transform: translateY(-1px);
+  transition: all 0.2s ease-in-out;
+}
+
+.policy-content section h2 {
+  font-weight: 600;
+}
+
+.text-justify {
+  text-align: justify;
+} 

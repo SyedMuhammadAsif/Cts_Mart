@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, forkJoin, of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { CartItem, Cart } from '../models/cart-items';
 import { Product } from '../models/product';
 import { ToastService } from './toast-service';
@@ -50,16 +50,39 @@ export class CartService {
     });
   }
 
+  // Helper: adjust product stock (delta can be negative to reduce, positive to add back)
+  private adjustProductStock(productId: number, delta: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/products/${productId}`).pipe(
+      switchMap((product) => {
+        const current = Number(product.stock || 0);
+        const next = current + delta;
+        if (next < 0) {
+          return of(product); // Do not allow negative stock; noop
+        }
+        return this.http.put<Product>(`${this.apiUrl}/products/${productId}`, {
+          ...product,
+          stock: next
+        });
+      })
+    );
+  }
+
   addToCart(productId: number, quantity: number = 1): Observable<any> {
     return this.http.get<Product>(`${this.apiUrl}/products/${productId}`).pipe(
       switchMap(product => {
+        // Ensure there is enough stock for this add
+        const available = Number(product.stock || 0);
+        if (available < quantity) {
+          throw new Error('Insufficient stock');
+        }
+
         const currentCart = this.cartSubject.value;
         const existingItem = currentCart.items.find(item => item.ProductID === productId);
 
         if (existingItem) {
           // Update existing item
           const newQuantity = existingItem.Quantity + quantity;
-          const newTotalPrice = product.price * newQuantity;
+          const newTotalPrice = (product.price || 0) * newQuantity;
 
           if (!existingItem.id) {
             throw new Error('Existing cart item missing ID');
@@ -69,17 +92,21 @@ export class CartService {
             ...existingItem,
             Quantity: newQuantity,
             TotalPrice: newTotalPrice
-          });
+          }).pipe(
+            switchMap(() => this.adjustProductStock(productId, -quantity))
+          );
         } else {
           // Create new cart item
           const newCartItem: Omit<CartItem, 'id'> = {
             ProductID: productId,
             Quantity: quantity,
-            TotalPrice: product.price * quantity,
+            TotalPrice: (product.price || 0) * quantity,
             CartItemID: Date.now() // Temporary ID, JSON-server will generate the real one
           };
 
-          return this.http.post<CartItem>(`${this.apiUrl}/cart`, newCartItem);
+          return this.http.post<CartItem>(`${this.apiUrl}/cart`, newCartItem).pipe(
+            switchMap(() => this.adjustProductStock(productId, -quantity))
+          );
         }
       }),
       tap(() => {
@@ -90,7 +117,15 @@ export class CartService {
   }
 
   removeFromCart(cartItemId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/cart/${cartItemId}`).pipe(
+    // Read the item first to know quantity and product id, then delete and give stock back
+    return this.http.get<CartItem>(`${this.apiUrl}/cart/${cartItemId}`).pipe(
+      switchMap((item) => {
+        const qty = Number(item?.Quantity || 0);
+        const productId = Number(item?.ProductID);
+        return this.http.delete<void>(`${this.apiUrl}/cart/${cartItemId}`).pipe(
+          switchMap(() => qty > 0 && productId ? this.adjustProductStock(productId, +qty) : of(null))
+        );
+      }),
       tap(() => {
         this.loadCart();
         this.toastService.showInfo('Item removed from cart');
@@ -110,27 +145,49 @@ export class CartService {
       return this.removeFromCart(cartItemId);
     }
 
-    const newTotalPrice = (item.Product?.price || 0) * newQuantity;
+    const oldQuantity = Number(item.Quantity || 0);
+    const delta = newQuantity - oldQuantity; // positive means increase → reduce stock; negative → add back
 
-    return this.http.put<CartItem>(`${this.apiUrl}/cart/${cartItemId}`, {
-      ...item,
-      Quantity: newQuantity,
-      TotalPrice: newTotalPrice
-    }).pipe(
+    return this.http.get<Product>(`${this.apiUrl}/products/${item.ProductID}`).pipe(
+      switchMap((product) => {
+        // If increasing, ensure stock is sufficient
+        if (delta > 0 && Number(product.stock || 0) < delta) {
+          throw new Error('Insufficient stock for requested quantity');
+        }
+        const newTotalPrice = (product.price || 0) * newQuantity;
+        return this.http.put<CartItem>(`${this.apiUrl}/cart/${cartItemId}`, {
+          ...item,
+          Quantity: newQuantity,
+          TotalPrice: newTotalPrice
+        }).pipe(
+          switchMap(() => delta !== 0 ? this.adjustProductStock(item.ProductID, -delta) : of(null))
+        );
+      }),
       tap(() => this.loadCart())
     );
   }
 
   clearCart(): Observable<any> {
     const currentCart = this.cartSubject.value;
-    const deleteRequests = currentCart.items.map(item =>
-      this.http.delete(`${this.apiUrl}/cart/${item.id}`)
-    );
+    const items = (currentCart.items || []).filter(i => !!i && !!i.id);
 
-    return forkJoin(deleteRequests).pipe(
+    if (items.length === 0) {
+      this.loadCart();
+      return of(true);
+    }
+
+    const deletes = items.map(item => this.http.delete<void>(`${this.apiUrl}/cart/${item.id}`));
+
+    return forkJoin(deletes).pipe(
       tap(() => {
         this.loadCart();
         this.toastService.showInfo('Cart cleared successfully');
+      }),
+      map(() => true),
+      catchError(() => {
+        // Even if some deletes fail, refresh the cart to reflect server state
+        this.loadCart();
+        return of(true);
       })
     );
   }

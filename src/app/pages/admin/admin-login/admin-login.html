@@ -1,0 +1,93 @@
+<div class="admin-login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Admin Login</h1>
+      <p>Access your admin dashboard</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="loginData.email"
+          placeholder="Enter your email"
+          required
+          [disabled]="isLoading"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-input">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            name="password"
+            [(ngModel)]="loginData.password"
+            placeholder="Enter your password"
+            required
+            [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [disabled]="isLoading"
+          >
+            <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        class="login-btn"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="!isLoading">Login</span>
+        <span *ngIf="isLoading" class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          Logging in...
+        </span>
+      </button>
+    </form>
+
+    <div class="demo-credentials">
+      <button
+        type="button"
+        class="demo-btn"
+        (click)="getDemoCredentials()"
+        [disabled]="isLoading"
+      >
+        <i class="fas fa-key"></i>
+        Load Demo Credentials
+      </button>
+      
+      <div class="credentials-info">
+        <h4>Demo Admin Accounts:</h4>
+        <ul>
+          <li><strong>Super Admin:</strong> superadmin@megamart.com</li>
+          <li><strong>Product Manager:</strong> productmanager@megamart.com</li>
+          <li><strong>Customer Manager:</strong> customermanager@megamart.com</li>
+          <li><strong>Order Manager:</strong> ordermanager@megamart.com</li>
+          <li><strong>Password:</strong> admin123</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="back-to-site">
+      <a routerLink="/" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Main Site
+      </a>
+    </div>
+  </div>
+</div> 
