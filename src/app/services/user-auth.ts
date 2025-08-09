@@ -64,6 +64,7 @@ export class UserAuth {
           if (user.password === hashedPassword) {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userId', `${user.user_id}`);
+            localStorage.setItem('userEmail', user.email);
           } else {
             throw new Error('Password is incorrect');
           }
@@ -78,9 +79,14 @@ export class UserAuth {
   logout(): void {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
   }
 
   isLoggedIn(): boolean {
     return localStorage.getItem('isLoggedIn') === 'true';
+  }
+
+  getCurrentUserEmail(): string | null {
+    return localStorage.getItem('userEmail');
   }  
 }

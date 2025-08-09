@@ -1,0 +1,270 @@
+/* Admin Dashboard Specific Styles - CTS Blue Theme */
+
+/* Admin Header Styling */
+.admin-header {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-bottom: 3px solid #1e3a8a;
+}
+
+.admin-nav .btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.admin-nav .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Statistics Cards */
+.stat-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1e40af);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card .card-body {
+  padding: 2rem 1.5rem;
+}
+
+.stat-card h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Order Status Cards */
+.order-status-card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.order-status-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.status-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.status-icon.pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.status-icon.shipped {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.status-icon.delivered {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+/* Content Cards */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  border-bottom: none;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 1.2rem 1.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Table Styling */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  padding: 1rem 0.75rem;
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #f3f4f6;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Badge Styling */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+}
+
+.badge-warning {
+  background-color: #fbbf24;
+  color: #92400e;
+}
+
+.badge-info {
+  background-color: #60a5fa;
+  color: #1e40af;
+}
+
+.badge-primary {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.badge-success {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.badge-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.badge-secondary {
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+/* Alert Styling */
+.alert {
+  border-radius: 8px;
+  border: none;
+  padding: 1rem;
+}
+
+.alert-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-left: 4px solid #fbbf24;
+}
+
+/* Button Styling */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.btn-warning {
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+  color: #92400e;
+}
+
+.btn-warning:hover {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+/* Loading Spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-header .row {
+    text-align: center;
+  }
+  
+  .admin-nav {
+    margin-top: 1rem;
+  }
+  
+  .admin-nav .btn {
+    margin: 0.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .stat-card h3 {
+    font-size: 2rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .admin-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .stat-card .card-body {
+    padding: 1.5rem 1rem;
+  }
+  
+  .stat-card h3 {
+    font-size: 1.8rem;
+  }
+} 

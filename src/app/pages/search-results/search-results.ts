@@ -55,7 +55,7 @@ export class SearchResults implements OnInit {
     );
 
     // Use Promise.all to fetch all products
-    Promise.all(productRequests.map(req => req.toPromise()))
+    Promise.all(productRequests.map(req => import('rxjs').then(({ firstValueFrom }) => firstValueFrom(req))))
       .then(products => {
         this.searchResults = products.filter(product => product != null) as Product[];
         this.noResults = this.searchResults.length === 0;

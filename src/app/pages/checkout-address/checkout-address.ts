@@ -66,6 +66,7 @@ export class CheckoutAddressComponent implements OnInit {
       // If form is invalid, show error messages
       this.markFormGroupTouched(form);
     }
+
   }
 
   private markFormGroupTouched(form: NgForm): void {
@@ -80,5 +81,21 @@ export class CheckoutAddressComponent implements OnInit {
 
   formatPrice(price: number): string {
     return `$${price.toFixed(2)}`;
+  }
+
+  // Format phone number to only allow digits
+  formatPhoneNumber(event: any): void {
+    let value = event.target.value.replace(/\D/g, ''); // Remove non-digits
+    value = value.substring(0, 10); // Limit to 10 digits
+    this.address.phone = value;
+    event.target.value = value;
+  }
+
+  // Format ZIP code to only allow digits
+  formatZipCode(event: any): void {
+    let value = event.target.value.replace(/\D/g, ''); // Remove non-digits
+    value = value.substring(0, 6); // Limit to 6 digits
+    this.address.postalCode = value;
+    event.target.value = value;
   }
 } 

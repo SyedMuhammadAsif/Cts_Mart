@@ -1,4 +1,4 @@
-<!-- Payment Success Toast -->
+
 <app-payment-toast></app-payment-toast>
 
 <div class="container mt-4">
@@ -97,9 +97,12 @@
               </div>
               <div class="card-body">
                 <div class="tracking-timeline">
-                  <div *ngFor="let step of trackingSteps; let i = index" class="tracking-step mb-0" [class.completed]="step.completed">
+                  <div *ngFor="let step of trackingSteps; let i = index" class="tracking-step mb-0" [class.completed]="step.completed" [class.current]="step.current">
                     <div class="step-indicator">
-                      <div class="step-number">{{i + 1}}</div>
+                      <div class="step-number">
+                        <span *ngIf="step.completed">✓</span>
+                        <span *ngIf="!step.completed">{{i + 1}}</span>
+                      </div>
                     </div>
                     <div class="step-content">
                       <h6 class="step-title">{{step.title}}</h6>
@@ -128,6 +131,66 @@
                     <h6 class="mb-1">{{item.Product?.title || 'Product'}}</h6>
                     <p class="text-muted small mb-1">Quantity: {{item.Quantity || 0}}</p>
                     <p class="text-muted small mb-0">Price: {{formatPrice(item.TotalPrice || 0)}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Tracking Information -->
+            <div class="card mt-4" *ngIf="order.currentLocation || order.processingNotes">
+              <div class="card-header">
+                <h5 class="mb-0">Processing Information</h5>
+              </div>
+              <div class="card-body">
+                <div *ngIf="order.currentLocation" class="mb-3">
+                  <h6>Current Location:</h6>
+                  <p class="mb-1"><strong>{{order.currentLocation.name}}</strong></p>
+                  <p class="mb-1">{{order.currentLocation.address}}</p>
+                  <p class="mb-1">{{order.currentLocation.city}}, {{order.currentLocation.state}} {{order.currentLocation.postalCode}}</p>
+                  <p class="mb-0">{{order.currentLocation.country}}</p>
+                </div>
+                
+                <div *ngIf="order.processingNotes" class="mb-3">
+                  <h6>Processing Notes:</h6>
+                  <p class="text-muted">{{order.processingNotes}}</p>
+                </div>
+                
+                <div *ngIf="order.lastUpdated" class="mb-3">
+                  <h6>Last Updated:</h6>
+                  <p class="text-muted">{{formatDate(order.lastUpdated)}} by {{order.updatedBy || 'System'}}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Tracking History -->
+            <div class="card mt-4" *ngIf="trackingHistory.length > 0">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Detailed Tracking History</h5>
+                <button 
+                  class="btn btn-outline-primary btn-sm" 
+                  (click)="toggleTrackingHistory()">
+                  {{ showTrackingHistory ? 'Hide' : 'Show' }} Details
+                </button>
+              </div>
+              <div class="card-body" *ngIf="showTrackingHistory">
+                <div class="timeline">
+                  <div *ngFor="let entry of trackingHistory; let i = index" class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <h6 class="mb-1">{{entry.status | titlecase}}</h6>
+                          <p class="text-muted mb-1">{{entry.description}}</p>
+                          <p *ngIf="entry.location" class="text-muted small mb-0">
+                            <i class="fas fa-map-marker-alt"></i> {{entry.location}}
+                          </p>
+                        </div>
+                        <div class="text-end">
+                          <small class="text-muted">{{formatDate(entry.timestamp)}}</small>
+                          <p *ngIf="entry.updatedBy" class="text-muted small mb-0">by {{entry.updatedBy}}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

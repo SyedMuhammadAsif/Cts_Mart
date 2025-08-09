@@ -1,0 +1,745 @@
+<!-- Admin Header -->
+<div class="admin-header theme-major-color text-light">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h2 class="mb-0">Product Management</h2>
+        <small>Manage your product catalog</small>
+      </div>
+      <div class="col-md-6">
+        <app-admin-nav></app-admin-nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid py-4">
+  <!-- Success/Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border theme-text-color" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3">Loading products...</p>
+  </div>
+
+  <!-- Products Content -->
+  <div *ngIf="!isLoading">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <h4>Products ({{ totalItems }})</h4>
+      </div>
+      <div class="col-md-6 text-end">
+        <button class="btn btn-primary" (click)="openAddForm()">
+          <i class="fas fa-plus"></i> Add New Product
+        </button>
+        <button class="btn btn-outline-secondary ms-2" (click)="clearFilters()">
+          <i class="fas fa-times"></i> Clear Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters Row -->
+    <div class="row mb-4">
+      <div class="col-md-2">
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Search title..."
+          [(ngModel)]="filters.title"
+          (input)="applyFilters()">
+      </div>
+      <div class="col-md-2">
+        <select 
+          class="form-select" 
+          [(ngModel)]="filters.category"
+          (change)="applyFilters()">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select 
+          class="form-select" 
+          [(ngModel)]="filters.brand"
+          (change)="applyFilters()">
+          <option value="">All Brands</option>
+          <option *ngFor="let brand of brands" [value]="brand">
+            {{ brand }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select 
+          class="form-select" 
+          [(ngModel)]="filters.availabilityStatus"
+          (change)="applyFilters()">
+          <option value="">All Status</option>
+          <option *ngFor="let status of availabilityStatuses" [value]="status">
+            {{ status }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input 
+          type="number" 
+          class="form-control" 
+          placeholder="Min Price"
+          [(ngModel)]="filters.minPrice"
+          (input)="applyFilters()">
+      </div>
+      <div class="col-md-2">
+        <input 
+          type="number" 
+          class="form-control" 
+          placeholder="Max Price"
+          [(ngModel)]="filters.maxPrice"
+          (input)="applyFilters()">
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+      <div class="card-header theme-major-color text-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Products ({{ totalItems }})</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 30%;">
+                  <button class="btn btn-link text-light p-0" (click)="sortBy('title')">
+                    Title {{ getSortIcon('title') }}
+                  </button>
+                </th>
+                <th style="width: 12%;">
+                  <button class="btn btn-link text-light p-0" (click)="sortBy('category')">
+                    Category {{ getSortIcon('category') }}
+                  </button>
+                </th>
+                <th style="width: 12%;">
+                  <button class="btn btn-link text-light p-0" (click)="sortBy('brand')">
+                    Brand {{ getSortIcon('brand') }}
+                  </button>
+                </th>
+                <th style="width: 12%;">
+                  <button class="btn btn-link text-light p-0" (click)="sortBy('price')">
+                    Price {{ getSortIcon('price') }}
+                  </button>
+                </th>
+                <th style="width: 10%;">
+                  <button class="btn btn-link text-light p-0" (click)="sortBy('stock')">
+                    Stock {{ getSortIcon('stock') }}
+                  </button>
+                </th>
+                <th style="width: 12%;">Status</th>
+                <th style="width: 12%;">Actions</th>
+              </tr>
+            </thead>
+                        <tbody>
+              <tr *ngFor="let product of displayedProducts; trackBy: trackByProductId">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img 
+                      [src]="product.thumbnail" 
+                      [alt]="product.title"
+                      class="product-thumbnail me-2"
+                      onerror="this.src='https://via.placeholder.com/40x40?text=No+Image'">
+                    <div>
+                      <strong>{{ product.title }}</strong>
+                      <br>
+                      <small class="text-muted">ID: {{ product.id }}</small>
+                      <small class="text-muted d-block">{{ product.description | slice:0:50 }}...</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.brand || 'N/A' }}</td>
+                <td>
+                  <strong>{{ formatCurrency(product.price) }}</strong>
+                  <span *ngIf="product.discountPercentage && product.discountPercentage > 0" class="badge bg-danger ms-1">
+                    -{{ product.discountPercentage }}%
+                  </span>
+                </td>
+                <td>
+                  <span [ngClass]="'badge ' + getStockBadgeClass(product.stock)">
+                    {{ product.stock }}
+                  </span>
+                </td>
+                <td>
+                  <span [ngClass]="'badge ' + getAvailabilityBadgeClass(product.availabilityStatus ?? 'In Stock')">
+                    {{ product.availabilityStatus ?? 'In Stock' }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button 
+                      class="btn btn-outline-primary"
+                      (click)="viewProduct(product)"
+                      title="View Product">
+                      View
+                    </button>
+                    <button 
+                      class="btn btn-outline-success"
+                      (click)="openEditForm(product)"
+                      title="Edit Product">
+                      Update
+                    </button>
+                    <button 
+                      class="btn btn-outline-danger"
+                      (click)="deleteProduct(product)"
+                      title="Delete Product">
+                      Remove
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <div>
+            <small class="text-muted">
+              Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to 
+              {{ Math.min(currentPage * itemsPerPage, totalItems) }} of 
+              {{ totalItems }} products
+            </small>
+          </div>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+                  Previous
+                </button>
+              </li>
+              <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" 
+                  [class.active]="currentPage === i + 1">
+                <button class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Product Modal -->
+<div *ngIf="showAddForm" class="modal-backdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; overflow-y: auto;">
+  <div class="modal-dialog modal-lg" style="margin: 20px auto; max-width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Product</h5>
+        <button type="button" class="btn-close" (click)="closeForms()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="productForm" (ngSubmit)="addProduct()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="title" class="form-label">Product Title *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="title"
+                formControlName="title"
+                [class.is-invalid]="productForm.get('title')?.invalid && productForm.get('title')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('title')">
+                {{ getFieldError('title') }}
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Category *</label>
+              <select 
+                class="form-select" 
+                id="category"
+                formControlName="category"
+                [class.is-invalid]="productForm.get('category')?.invalid && productForm.get('category')?.touched">
+                <option value="">Select Category</option>
+                <option *ngFor="let category of categories" [value]="category">
+                  {{ category }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="getFieldError('category')">
+                {{ getFieldError('category') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description *</label>
+            <textarea 
+              class="form-control" 
+              id="description"
+              rows="3"
+              formControlName="description"
+              [class.is-invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched">
+            </textarea>
+            <div class="invalid-feedback" *ngIf="getFieldError('description')">
+              {{ getFieldError('description') }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="price" class="form-label">Price *</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="price"
+                formControlName="price"
+                step="0.01"
+                [class.is-invalid]="productForm.get('price')?.invalid && productForm.get('price')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('price')">
+                {{ getFieldError('price') }}
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="stock" class="form-label">Stock *</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="stock"
+                formControlName="stock"
+                [class.is-invalid]="productForm.get('stock')?.invalid && productForm.get('stock')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('stock')">
+                {{ getFieldError('stock') }}
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="brand" class="form-label">Brand *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="brand"
+                formControlName="brand"
+                [class.is-invalid]="productForm.get('brand')?.invalid && productForm.get('brand')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('brand')">
+                {{ getFieldError('brand') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="thumbnail" class="form-label">Thumbnail URL *</label>
+              <input 
+                type="url" 
+                class="form-control" 
+                id="thumbnail"
+                formControlName="thumbnail"
+                [class.is-invalid]="productForm.get('thumbnail')?.invalid && productForm.get('thumbnail')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('thumbnail')">
+                {{ getFieldError('thumbnail') }}
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="sku" class="form-label">SKU *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="sku"
+                formControlName="sku"
+                [class.is-invalid]="productForm.get('sku')?.invalid && productForm.get('sku')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('sku')">
+                {{ getFieldError('sku') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="images" class="form-label">Additional Images (comma-separated URLs)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="images"
+                formControlName="images"
+                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="tags" class="form-label">Tags (comma-separated)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="tags"
+                formControlName="tags"
+                placeholder="tag1, tag2, tag3">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="discountPercentage" class="form-label">Discount %</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="discountPercentage"
+                formControlName="discountPercentage"
+                min="0"
+                max="100">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="rating" class="form-label">Rating</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="rating"
+                formControlName="rating"
+                min="0"
+                max="5"
+                step="0.1">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="availabilityStatus" class="form-label">Status</label>
+              <select class="form-select" id="availabilityStatus" formControlName="availabilityStatus">
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="productForm.invalid || isLoading">
+              <span *ngIf="!isLoading">Add Product</span>
+              <span *ngIf="isLoading">
+                <i class="fas fa-spinner fa-spin"></i> Adding...
+              </span>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="closeForms()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div *ngIf="showEditForm" class="modal-backdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; overflow-y: auto;">
+  <div class="modal-dialog modal-lg" style="margin: 20px auto; max-width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Product: {{ selectedProduct?.title }}</h5>
+        <button type="button" class="btn-close" (click)="closeForms()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="productForm" (ngSubmit)="editProduct()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editTitle" class="form-label">Product Title *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editTitle"
+                formControlName="title"
+                [class.is-invalid]="productForm.get('title')?.invalid && productForm.get('title')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('title')">
+                {{ getFieldError('title') }}
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editCategory" class="form-label">Category *</label>
+              <select 
+                class="form-select" 
+                id="editCategory"
+                formControlName="category"
+                [class.is-invalid]="productForm.get('category')?.invalid && productForm.get('category')?.touched">
+                <option value="">Select Category</option>
+                <option *ngFor="let category of categories" [value]="category">
+                  {{ category }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="getFieldError('category')">
+                {{ getFieldError('category') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Description *</label>
+            <textarea 
+              class="form-control" 
+              id="editDescription"
+              rows="3"
+              formControlName="description"
+              [class.is-invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched">
+            </textarea>
+            <div class="invalid-feedback" *ngIf="getFieldError('description')">
+              {{ getFieldError('description') }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="editPrice" class="form-label">Price *</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="editPrice"
+                formControlName="price"
+                step="0.01"
+                [class.is-invalid]="productForm.get('price')?.invalid && productForm.get('price')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('price')">
+                {{ getFieldError('price') }}
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="editStock" class="form-label">Stock *</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="editStock"
+                formControlName="stock"
+                [class.is-invalid]="productForm.get('stock')?.invalid && productForm.get('stock')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('stock')">
+                {{ getFieldError('stock') }}
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="editBrand" class="form-label">Brand *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editBrand"
+                formControlName="brand"
+                [class.is-invalid]="productForm.get('brand')?.invalid && productForm.get('brand')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('brand')">
+                {{ getFieldError('brand') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editThumbnail" class="form-label">Thumbnail URL *</label>
+              <input 
+                type="url" 
+                class="form-control" 
+                id="editThumbnail"
+                formControlName="thumbnail"
+                [class.is-invalid]="productForm.get('thumbnail')?.invalid && productForm.get('thumbnail')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('thumbnail')">
+                {{ getFieldError('thumbnail') }}
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editSku" class="form-label">SKU *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editSku"
+                formControlName="sku"
+                [class.is-invalid]="productForm.get('sku')?.invalid && productForm.get('sku')?.touched">
+              <div class="invalid-feedback" *ngIf="getFieldError('sku')">
+                {{ getFieldError('sku') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="editImages" class="form-label">Additional Images (comma-separated URLs)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editImages"
+                formControlName="images"
+                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="editTags" class="form-label">Tags (comma-separated)</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editTags"
+                formControlName="tags"
+                placeholder="tag1, tag2, tag3">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="editDiscountPercentage" class="form-label">Discount %</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="editDiscountPercentage"
+                formControlName="discountPercentage"
+                min="0"
+                max="100">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="editRating" class="form-label">Rating</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="editRating"
+                formControlName="rating"
+                min="0"
+                max="5"
+                step="0.1">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="editAvailabilityStatus" class="form-label">Status</label>
+              <select class="form-select" id="editAvailabilityStatus" formControlName="availabilityStatus">
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="productForm.invalid || isLoading">
+              <span *ngIf="!isLoading">Update Product</span>
+              <span *ngIf="isLoading">
+                <i class="fas fa-spinner fa-spin"></i> Updating...
+              </span>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="closeForms()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Product Modal -->
+<div *ngIf="showViewModal" class="modal-backdrop" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; overflow-y: auto;">
+  <div class="modal-dialog modal-lg" style="margin: 20px auto; max-width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Product Details: {{ selectedProduct?.title }}</h5>
+        <button type="button" class="btn-close" (click)="closeViewModal()"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedProduct">
+        <div class="row">
+          <div class="col-md-4">
+            <img [src]="selectedProduct.thumbnail" [alt]="selectedProduct.title" class="img-fluid rounded">
+            <div *ngIf="selectedProduct.images && selectedProduct.images.length > 0" class="mt-2">
+              <small class="text-muted">Additional Images:</small>
+              <div class="row mt-1">
+                <div *ngFor="let image of selectedProduct.images.slice(0, 4)" class="col-3">
+                  <img [src]="image" [alt]="selectedProduct.title" class="img-fluid rounded" 
+                       onerror="this.src='https://via.placeholder.com/50x50?text=No+Image'">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <h4>{{ selectedProduct.title }}</h4>
+            <p class="text-muted">{{ selectedProduct.description }}</p>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Price:</strong> {{ formatCurrency(selectedProduct.price) }}
+                <span *ngIf="selectedProduct.discountPercentage && selectedProduct.discountPercentage > 0" class="badge bg-danger ms-1">
+                  -{{ selectedProduct.discountPercentage }}%
+                </span>
+              </div>
+              <div class="col-md-6">
+                <strong>Stock:</strong> 
+                <span [ngClass]="'badge ' + getStockBadgeClass(selectedProduct.stock)">
+                  {{ selectedProduct.stock }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <strong>Category:</strong> {{ selectedProduct.category }}
+              </div>
+              <div class="col-md-6">
+                <strong>Brand:</strong> {{ selectedProduct.brand || 'N/A' }}
+              </div>
+            </div>
+            
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <strong>SKU:</strong> {{ selectedProduct.sku || 'N/A' }}
+              </div>
+              <div class="col-md-6">
+                <strong>Status:</strong> 
+                <span [ngClass]="'badge ' + getAvailabilityBadgeClass(selectedProduct.availabilityStatus ?? 'In Stock')">
+                  {{ selectedProduct.availabilityStatus ?? 'In Stock' }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="row mt-2" *ngIf="selectedProduct.weight">
+              <div class="col-md-6">
+                <strong>Weight:</strong> {{ selectedProduct.weight }} kg
+              </div>
+              <div class="col-md-6" *ngIf="selectedProduct.dimensions">
+                <strong>Dimensions:</strong> {{ selectedProduct.dimensions.width }}x{{ selectedProduct.dimensions.height }}x{{ selectedProduct.dimensions.depth }} cm
+              </div>
+            </div>
+            
+            <div class="row mt-2" *ngIf="selectedProduct.rating">
+              <div class="col-md-6">
+                <strong>Rating:</strong> ⭐ {{ selectedProduct.rating }}/5
+              </div>
+            </div>
+            
+            <div *ngIf="selectedProduct.warrantyInformation" class="mt-2">
+              <strong>Warranty:</strong> {{ selectedProduct.warrantyInformation }}
+            </div>
+            
+            <div *ngIf="selectedProduct.shippingInformation" class="mt-2">
+              <strong>Shipping:</strong> {{ selectedProduct.shippingInformation }}
+            </div>
+            
+            <div *ngIf="selectedProduct.tags && selectedProduct.tags.length > 0" class="mt-2">
+              <strong>Tags:</strong>
+              <div class="mt-1">
+                <span *ngFor="let tag of selectedProduct.tags" class="badge bg-secondary me-1">{{ tag }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeViewModal()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="openEditForm(selectedProduct!)" *ngIf="selectedProduct">Edit Product</button>
+      </div>
+    </div>
+  </div>
+</div> 

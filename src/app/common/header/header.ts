@@ -7,6 +7,8 @@ import { ProductService } from '../../services/product-service';
 import { CartService } from '../../services/cart-service';
 import { UserProfile } from '../../pages/user-profile/user-profile';
 import { UserAuth } from '../../services/user-auth';
+import { AdminAuthService } from '../../services/admin-auth.service';
+import { Admin, AdminLoginData } from '../../models/admin';
 
 @Component({
   selector: 'app-header',
@@ -18,6 +20,13 @@ export class Header implements OnInit, OnDestroy {
   searchQuery: string = '';
   cartCount: number = 0;
   private subscription = new Subscription();
+  
+  // Admin-related properties
+  adminLoginData: AdminLoginData = {
+    email: '',
+    password: ''
+  };
+  currentAdmin: Admin | null = null;
   
   isSidebarOpen = false;
   wishlistCount = 2;
@@ -31,7 +40,8 @@ export class Header implements OnInit, OnDestroy {
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
-    private auth: UserAuth
+    private auth: UserAuth,
+    public adminAuth: AdminAuthService
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +55,13 @@ export class Header implements OnInit, OnDestroy {
     });
     this.subscription.add(cartSub);
 
-    this.productService.getCategory().subscribe(res => {
+    // Subscribe to admin authentication changes
+    const adminSub = this.adminAuth.currentAdmin$.subscribe(admin => {
+      this.currentAdmin = admin;
+    });
+    this.subscription.add(adminSub);
+
+    this.productService.getCategory().subscribe((res: { name: string; slug: string; }[]) => {
       this.categories = res;
       console.log(this.categories);
     });
@@ -149,6 +165,37 @@ export class Header implements OnInit, OnDestroy {
   }
   isLoggedIn() {
     return this.auth.isLoggedIn();
+  }
+
+  // Admin authentication methods
+  isAdminLoggedIn(): boolean {
+    return this.adminAuth.isLoggedIn();
+  }
+
+  onAdminLogin(): void {
+    if (!this.adminLoginData.email || !this.adminLoginData.password) {
+      alert('Please enter both email and password');
+      return;
+    }
+
+    this.adminAuth.login(this.adminLoginData).subscribe({
+      next: (admin) => {
+        console.log('Admin login successful:', admin);
+        // Clear the form
+        this.adminLoginData = { email: '', password: '' };
+        // Navigate to admin dashboard
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: (error) => {
+        console.error('Admin login error:', error);
+        alert('Invalid admin credentials. Please try again.');
+      }
+    });
+  }
+
+  onAdminLogout(): void {
+    this.adminAuth.logout();
+    this.router.navigate(['/']);
   }
 
   onAddressClick(): void {

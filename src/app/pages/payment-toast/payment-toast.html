@@ -1,8 +1,10 @@
 <div class="payment-toast" *ngIf="showToast">
-  <div class="toast-content">
-    <span class="toast-message">{{ message }}</span>
-    <button class="toast-close" (click)="closeToast()" type="button" aria-label="Close toast">
-      ×
-    </button>
+  <div class="toast-card">
+    <div class="toast-header">
+      <span class="icon">✔</span>
+      <span class="title">Notification</span>
+      <button class="close" (click)="closeToast()">×</button>
+    </div>
+    <div class="toast-body">{{ message }}</div>
   </div>
 </div> 

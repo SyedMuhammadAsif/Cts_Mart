@@ -26,6 +26,8 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "chart.js": "^4.5.0",
+    "ng2-charts": "^8.0.0",
     "rxjs": "~7.8.0",
     "ts-md5": "^2.0.1",
     "tslib": "^2.3.0",
@@ -33,7 +35,7 @@
   },
   "devDependencies": {
     "@angular/build": "^20.1.1",
-    "@angular/cli": "^20.1.1",
+    "@angular/cli": "^20.1.5",
     "@angular/compiler-cli": "^20.1.0",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.8.0",

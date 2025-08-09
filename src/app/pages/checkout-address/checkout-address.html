@@ -24,10 +24,13 @@
                   name="fullName"
                   [(ngModel)]="address.fullName"
                   required
+                  minlength="5"
                   #fullName="ngModel"
-                  [class.is-invalid]="fullName.invalid && fullName.touched">
+                  [class.is-invalid]="fullName.invalid && fullName.touched"
+                  placeholder="Enter your full name (min 5 characters)">
                 <div class="invalid-feedback" *ngIf="fullName.invalid && fullName.touched">
-                  Full name is required
+                  <span *ngIf="fullName.errors?.['required']">Full name is required</span>
+                  <span *ngIf="fullName.errors?.['minlength']">Full name must be at least 5 characters</span>
                 </div>
               </div>
               <div class="col-md-6">
@@ -60,11 +63,15 @@
                   name="phone"
                   [(ngModel)]="address.phone"
                   required
+                  pattern="[0-9]{10}"
+                  maxlength="10"
                   #phone="ngModel"
                   [class.is-invalid]="phone.invalid && phone.touched"
-                  placeholder="(555) 123-4567">
+                  placeholder="1234567890 (10 digits only)"
+                  (input)="formatPhoneNumber($event)">
                 <div class="invalid-feedback" *ngIf="phone.invalid && phone.touched">
-                  Phone number is required
+                  <span *ngIf="phone.errors?.['required']">Phone number is required</span>
+                  <span *ngIf="phone.errors?.['pattern']">Phone number must be exactly 10 digits</span>
                 </div>
               </div>
             </div>
@@ -141,11 +148,15 @@
                   name="postalCode"
                   [(ngModel)]="address.postalCode"
                   required
+                  pattern="[0-9]{6}"
+                  maxlength="6"
                   #postalCode="ngModel"
                   [class.is-invalid]="postalCode.invalid && postalCode.touched"
-                  placeholder="12345">
+                  placeholder="123456 (6 digits only)"
+                  (input)="formatZipCode($event)">
                 <div class="invalid-feedback" *ngIf="postalCode.invalid && postalCode.touched">
-                  ZIP code is required
+                  <span *ngIf="postalCode.errors?.['required']">ZIP code is required</span>
+                  <span *ngIf="postalCode.errors?.['pattern']">ZIP code must be exactly 6 digits</span>
                 </div>
               </div>
             </div>

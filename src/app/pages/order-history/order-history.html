@@ -38,7 +38,7 @@
           Start Shopping
         </button>
       </div>
-
+      
       <!-- Orders List -->
       <div *ngIf="!isLoading && !error && orders.length > 0">
         <div class="row">
@@ -49,6 +49,12 @@
               </div>
               <div class="card-body">
                 <div *ngFor="let order of orders" class="order-item border-bottom pb-3 mb-3">
+                <div *ngIf="order.orderStatus === 'cancelled' && order.paymentMethod?.type !== 'cod'" class="alert alert-info py-2 mb-2">
+                  <strong>Refund in progress:</strong> Your order was cancelled. A refund of {{formatPrice(order.total || 0)}} will be processed within 7 business days to your original payment method.
+                </div>
+                <div *ngIf="order.orderStatus === 'cancelled' && order.paymentMethod?.type === 'cod'" class="alert alert-secondary py-2 mb-2">
+                  <strong>Cancellation complete:</strong> Your order was cancelled. Since payment method was Cash on Delivery, no refund is applicable.
+                </div>
                   <div class="row align-items-center">
                                          <!-- Order Info -->
                      <div class="col-md-4">
@@ -73,14 +79,26 @@
                        <div class="small text-muted">Payment: {{order.paymentStatus || 'completed'}}</div>
                      </div>
                     
-                    <!-- Action Button -->
+                    <!-- Action Buttons -->
                     <div class="col-md-2 text-end">
+                      <div class="btn-group" role="group">
                       <button class="btn btn-outline-primary btn-sm" (click)="viewOrderDetails(order.orderNumber!)">
                         <svg width="14" height="14" fill="currentColor" class="me-1" viewBox="0 0 16 16">
                           <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
                         </svg>
                         Track
                       </button>
+                        <button 
+                          class="btn btn-outline-danger btn-sm" 
+                          (click)="openCancelModal(order)"
+                          *ngIf="canCancelOrder(order)">
+                          <svg width="14" height="14" fill="currentColor" class="me-1" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                          </svg>
+                          Cancel
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -91,4 +109,76 @@
       </div>
     </div>
   </div>
+
+  <!-- Cancel Order Modal -->
+  <div *ngIf="showCancelModal && selectedOrderForCancellation" 
+       style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; overflow-y: auto;">
+    <div style="margin: 20px auto; max-width: 500px; background: white; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      
+      <!-- Modal Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #dc3545; color: white; border-radius: 8px 8px 0 0;">
+        <h4 style="margin: 0; color: white;">Cancel Order - {{ selectedOrderForCancellation.orderNumber }}</h4>
+        <button type="button" (click)="closeCancelModal()" style="background: none; border: none; color: white; font-size: 30px; cursor: pointer;">&times;</button>
+      </div>
+
+      <!-- Modal Content -->
+      <div style="padding: 20px;">
+        <div class="alert alert-warning">
+          <h6>⚠️ Cancellation Notice</h6>
+          <p class="mb-0">Cancelling this order will stop the delivery process. Please provide a reason for cancellation.</p>
+        </div>
+
+        <!-- Order Info -->
+        <div class="mb-3">
+          <h6>Order Information:</h6>
+          <p><strong>Order Number:</strong> {{ selectedOrderForCancellation.orderNumber }}</p>
+          <p><strong>Status:</strong> 
+            <span class="badge bg-{{getStatusColor(selectedOrderForCancellation.orderStatus)}}">
+              {{getStatusText(selectedOrderForCancellation.orderStatus)}}
+            </span>
+          </p>
+          <p><strong>Amount:</strong> {{ formatPrice(selectedOrderForCancellation.total || 0) }}</p>
+        </div>
+
+        <!-- Cancellation Reason -->
+        <div class="mb-3">
+          <label for="cancellationReason" class="form-label">Reason for Cancellation:</label>
+          <select class="form-select" id="cancellationReason" [(ngModel)]="cancellationReason">
+            <option value="">Select a reason</option>
+            <option value="Delayed delivery">Delayed delivery</option>
+            <option value="Not satisfied with product">Not satisfied with product</option>
+            <option value="Changed my mind">Changed my mind</option>
+            <option value="Found better price elsewhere">Found better price elsewhere</option>
+            <option value="Shipping issues">Shipping issues</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="mb-3" *ngIf="cancellationReason === 'Other'">
+          <label for="customReason" class="form-label">Please specify:</label>
+          <textarea class="form-control" id="customReason" rows="3" placeholder="Please provide details about your cancellation reason..." [(ngModel)]="customReason"></textarea>
+        </div>
+
+        <!-- Confirmation Message -->
+        <div class="alert alert-info">
+          <small>
+            <strong>Note:</strong> Your cancellation request will be sent to our team. A refund will be processed if applicable.
+          </small>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display: flex; justify-content: space-between; padding: 20px; border-top: 1px solid #eee; background: #f8f9fa; border-radius: 0 0 8px 8px;">
+        <button type="button" (click)="closeCancelModal()" class="btn btn-secondary">Keep Order</button>
+        <button 
+          type="button" 
+          (click)="cancelOrder()" 
+          class="btn btn-danger"
+          [disabled]="!cancellationReason || (cancellationReason === 'Other' && !customReason)">
+          Cancel Order
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div> 

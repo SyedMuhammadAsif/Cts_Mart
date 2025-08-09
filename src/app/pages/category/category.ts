@@ -21,7 +21,7 @@ export class Category implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.getCategory().subscribe(res => {
+    this.productService.getCategory().subscribe((res: { name: string; slug: string; }[]) => {
       this.categories = res as any[];
       console.log(this.categories);
     });

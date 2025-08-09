@@ -7,6 +7,7 @@ export interface CartItem {
   Quantity: number;
   TotalPrice: number;
   Product?: Product; // Optional product details for display
+  user_id?: string; // Optional owner id for multi-user carts
 }
 
 export interface Cart {
